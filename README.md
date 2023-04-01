@@ -1,2 +1,2 @@
 # Escendit.Orleans.Streaming.RabbitMQ
-RabbitMQ Stream Provider for Orleans Streams
+RabbitMQ Stream Provider for Orleans Streaming
