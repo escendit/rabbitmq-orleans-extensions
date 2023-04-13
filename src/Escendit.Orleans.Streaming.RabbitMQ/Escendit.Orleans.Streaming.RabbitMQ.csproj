@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <IsPackable>true</IsPackable>
+        <Description>RabbitMQ Stream Provider for Orleans Streaming</Description>
+    </PropertyGroup>
+    <ItemGroup>
+      <PackageReference Include="Microsoft.Orleans.Streaming" Version="7.1.1" />
+      <PackageReference Include="RabbitMQ.Client" Version="6.5.0" />
+    </ItemGroup>
+    <ItemGroup>
+        <None Pack="true" PackagePath="" Include="$(SolutionDir)/README.md" />
+    </ItemGroup>
+</Project>
