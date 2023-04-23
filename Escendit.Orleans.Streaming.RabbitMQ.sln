@@ -7,6 +7,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{EFD3DA34-B04
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Escendit.Orleans.Streaming.RabbitMQ", "src\Escendit.Orleans.Streaming.RabbitMQ\Escendit.Orleans.Streaming.RabbitMQ.csproj", "{A5BAACBF-4FA9-4720-B73D-D6DE7DB33815}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{A5880995-120F-422E-9B46-4302F74C87FE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Escendit.Orleans.Streaming.RabbitMQ.Tests", "test\Escendit.Orleans.Streaming.RabbitMQ.Tests\Escendit.Orleans.Streaming.RabbitMQ.Tests.csproj", "{D73F5B22-EF89-48F6-8538-A23B1A22B052}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,11 +21,16 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{A5BAACBF-4FA9-4720-B73D-D6DE7DB33815} = {EFD3DA34-B04F-4C90-B3E0-BEB2402B2D6A}
+		{D73F5B22-EF89-48F6-8538-A23B1A22B052} = {A5880995-120F-422E-9B46-4302F74C87FE}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{A5BAACBF-4FA9-4720-B73D-D6DE7DB33815}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A5BAACBF-4FA9-4720-B73D-D6DE7DB33815}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A5BAACBF-4FA9-4720-B73D-D6DE7DB33815}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A5BAACBF-4FA9-4720-B73D-D6DE7DB33815}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D73F5B22-EF89-48F6-8538-A23B1A22B052}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D73F5B22-EF89-48F6-8538-A23B1A22B052}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D73F5B22-EF89-48F6-8538-A23B1A22B052}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D73F5B22-EF89-48F6-8538-A23B1A22B052}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
