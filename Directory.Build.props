@@ -5,14 +5,10 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
     <PropertyGroup>
-        <RepositoryType>git</RepositoryType>
-        <RepositoryUrl>https://github.com/escendit/Escendit.Orleans.Streaming.RabbitMQ</RepositoryUrl>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
     </PropertyGroup>
     <PropertyGroup>
-        <IncludeSymbols>true</IncludeSymbols>
-        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <EmbedUntrackedSources>true</EmbedUntrackedSources>
-        <Deterministic>true</Deterministic>
-        <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
+        <RepositoryType>git</RepositoryType>
+        <RepositoryUrl>https://github.com/escendit/Escendit.Orleans.Streaming.RabbitMQ</RepositoryUrl>
     </PropertyGroup>
 </Project>
