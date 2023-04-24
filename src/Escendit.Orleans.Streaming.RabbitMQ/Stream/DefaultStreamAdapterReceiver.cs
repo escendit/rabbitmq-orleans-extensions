@@ -52,8 +52,9 @@ internal partial class DefaultStreamAdapterReceiver : IQueueAdapterReceiver
     public async Task Initialize(TimeSpan timeout)
     {
         LogInitialize(_name, _queueId);
+        var streamName = NamingUtility.CreateNameForStream(_name, _queueId);
         _consumer = await _streamSystem
-            .CreateRawConsumer(new RawConsumerConfig(_queueId.ToString())
+            .CreateRawConsumer(new RawConsumerConfig(streamName)
             {
                 MessageHandler = async (consumer, context, message) =>
                 {

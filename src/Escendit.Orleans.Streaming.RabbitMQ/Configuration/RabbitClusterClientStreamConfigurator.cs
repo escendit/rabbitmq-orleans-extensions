@@ -30,11 +30,12 @@ public class RabbitClusterClientStreamConfigurator : ClusterClientPersistentStre
             .Services
             .AddClientStreaming();
 
-        clientBuilder.ConfigureServices(configure =>
-        {
-            configure
-                .AddSingletonNamedService(name, DefaultStreamAdapterFactory.Create)
-                .ConfigureNamedOptionForLogging<RabbitStreamOptions>(name);
-        });
+        clientBuilder
+            .ConfigureServices(configure =>
+            {
+                configure
+                    .AddSingletonNamedService(name, DefaultStreamAdapterFactory.Create)
+                    .ConfigureNamedOptionForLogging<RabbitStreamOptions>(name);
+            });
     }
 }

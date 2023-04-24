@@ -24,6 +24,9 @@ public class RabbitSiloStreamConfigurator : SiloPersistentStreamConfigurator
         Action<Action<IServiceCollection>> configureDelegate)
         : base(name, configureDelegate, DefaultStreamAdapterFactory.Create)
     {
+        ArgumentNullException.ThrowIfNull(name);
+        ArgumentNullException.ThrowIfNull(configureDelegate);
+
         ConfigureDelegate(services =>
         {
             services

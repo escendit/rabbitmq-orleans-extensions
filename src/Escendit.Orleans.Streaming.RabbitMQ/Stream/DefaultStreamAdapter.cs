@@ -75,20 +75,25 @@ internal partial class DefaultStreamAdapter : IQueueAdapter
         }
 
         var queueId = _consistentRingStreamQueueMapper.GetQueueForStream(streamId);
+        var streamName = NamingUtility.CreateNameForStream(Name, queueId);
 
         await _streamSystem
             .CreateStream(
-                new StreamSpec(queueId.ToString()));
+                new StreamSpec(streamName));
 
         var producer = await _streamSystem
             .CreateRawProducer(
-                new RawProducerConfig(queueId.ToString()),
+                new RawProducerConfig(streamName),
                 _loggerFactory.CreateLogger<Producer>());
 
         var lastPublishingId = await producer.GetLastPublishingId();
         var lastPublishingIdLong = Convert.ToInt64(lastPublishingId);
 
-        var container = new RabbitBatchContainer(streamId, events.Cast<object>().ToList(), requestContext, new RabbitStreamSequenceToken(lastPublishingIdLong));
+        var container = new RabbitBatchContainer(
+            streamId,
+            events.Cast<object>().ToList(),
+            requestContext,
+            new RabbitStreamSequenceToken(lastPublishingIdLong));
 
         var data = _serializer
             .SerializeToArray(container);
