@@ -13,8 +13,9 @@ using Microsoft.Extensions.Logging;
 /// <summary>
 /// Default Stream Adapter Receiver.
 /// </summary>
-internal class DefaultStreamAdapterReceiver : IQueueAdapterReceiver
+internal partial class DefaultStreamAdapterReceiver : IQueueAdapterReceiver
 {
+    private readonly ILogger _logger;
     private readonly string _name;
     private readonly QueueId _queueId;
     private readonly ILoggerFactory _loggerFactory;
@@ -41,6 +42,7 @@ internal class DefaultStreamAdapterReceiver : IQueueAdapterReceiver
         _name = name;
         _queueId = queueId;
         _loggerFactory = loggerFactory;
+        _logger = _loggerFactory.CreateLogger($"Escendit.Orleans.Streaming.RabbitMQ.Stream.{_queueId}");
         _serializer = serializer;
         _streamSystem = streamSystem;
         _inboundChannel = Channel.CreateBounded<RabbitBatchContainer>(16);
@@ -49,14 +51,14 @@ internal class DefaultStreamAdapterReceiver : IQueueAdapterReceiver
     /// <inheritdoc />
     public async Task Initialize(TimeSpan timeout)
     {
-        var logger = _loggerFactory.CreateLogger($"Escendit.Orleans.Streaming.RabbitMQ:Queue:{_queueId}");
+        LogInitialize(_name, _queueId);
         _consumer = await _streamSystem
             .CreateRawConsumer(new RawConsumerConfig(_queueId.ToString())
             {
                 MessageHandler = async (consumer, context, message) =>
                 {
-                    logger.LogInformation("Incoming Message: {Message} with {Size}", message.Data.Contents.ToString(), message.Data.Size.ToString());
-                    await _inboundChannel.Writer.WaitToWriteAsync();
+                    LogMessageHandlerIncomingMessage(_name, _queueId, message.Data.Size);
+                    await _inboundChannel.Writer.WaitToWriteAsync(); // Wait for queue
                     var container = _serializer.Deserialize(message.Data.Contents);
                     await _inboundChannel.Writer.WriteAsync(container);
                 },
@@ -66,6 +68,7 @@ internal class DefaultStreamAdapterReceiver : IQueueAdapterReceiver
     /// <inheritdoc />
     public Task<IList<IBatchContainer>> GetQueueMessagesAsync(int maxCount)
     {
+        LogGetQueueMessages(_name, _queueId, maxCount);
         var countdown = maxCount;
         var batchContainers = new List<IBatchContainer>(maxCount);
 
@@ -76,7 +79,11 @@ internal class DefaultStreamAdapterReceiver : IQueueAdapterReceiver
             if (_inboundChannel.Reader.TryRead(out var item))
             {
                 batchContainers.Add(item);
+                continue;
             }
+
+            // break the cycle if channel is exhausted.
+            break;
         }
 
         return Task.FromResult<IList<IBatchContainer>>(batchContainers);
@@ -86,8 +93,9 @@ internal class DefaultStreamAdapterReceiver : IQueueAdapterReceiver
     public async Task MessagesDeliveredAsync(IList<IBatchContainer> messages)
     {
         ArgumentNullException.ThrowIfNull(messages);
+        LogMessagesDelivered(_name, _queueId, messages.Count);
 
-        ulong maxNumber = Convert.ToUInt64(messages.Max(p => p.SequenceToken.SequenceNumber));
+        var maxNumber = Convert.ToUInt64(messages.Max(p => p.SequenceToken.SequenceNumber));
 
         if (maxNumber > 0)
         {
@@ -98,6 +106,42 @@ internal class DefaultStreamAdapterReceiver : IQueueAdapterReceiver
     /// <inheritdoc />
     public Task Shutdown(TimeSpan timeout)
     {
+        LogShutdown(_name, _queueId);
         return _consumer!.Close();
     }
+
+    [LoggerMessage(
+        EventId = 100,
+        EventName = "Log Initialize",
+        Level = LogLevel.Debug,
+        Message = "Initializing Receiver for ProviderName: {name}, QueueId: {queueId}")]
+    private partial void LogInitialize(string name, QueueId queueId);
+
+    [LoggerMessage(
+        EventId = 101,
+        EventName = "Log Message Handler Incoming Message",
+        Level = LogLevel.Debug,
+        Message = "Incoming Message for ProviderName: {name}, QueueId: {queueId}, Size: {size}")]
+    private partial void LogMessageHandlerIncomingMessage(string name, QueueId queueId, int size);
+
+    [LoggerMessage(
+        EventId = 102,
+        EventName = "Log Get Queue Messages",
+        Level = LogLevel.Debug,
+        Message = "Getting Queue Messages for ProviderName: {name}, QueueId {queueId}, MaxCount: {maxCount}")]
+    private partial void LogGetQueueMessages(string name, QueueId queueId, int maxCount);
+
+    [LoggerMessage(
+        EventId = 103,
+        EventName = "Log Messages Delivered",
+        Level = LogLevel.Debug,
+        Message = "Delivered Messages for ProviderName: {name}, QueueId: {queueId}, Count: {count}")]
+    private partial void LogMessagesDelivered(string name, QueueId queueId, int count);
+
+    [LoggerMessage(
+        EventId = 104,
+        EventName = "Log Shutdown",
+        Level = LogLevel.Debug,
+        Message = "Shutting down for ProviderName: {name}, QueueId: {queueId}")]
+    private partial void LogShutdown(string name, QueueId queueId);
 }
