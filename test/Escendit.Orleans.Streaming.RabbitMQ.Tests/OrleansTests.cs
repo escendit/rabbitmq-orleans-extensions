@@ -33,6 +33,7 @@ public class OrleansTests
     /// </summary>
     /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
     [Fact]
+    [UnitTest]
     public async Task TestActionAsync()
     {
         // Method intentionally left empty.
