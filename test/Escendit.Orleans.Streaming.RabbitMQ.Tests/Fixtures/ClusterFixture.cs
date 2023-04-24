@@ -19,7 +19,8 @@ public class ClusterFixture : IDisposable
         var builder = new TestClusterBuilder();
         builder
             .AddSiloBuilderConfigurator<TestSiloConfigurator>()
-            .AddSiloBuilderConfigurator<RabbitMQSiloConfigurator>();
+            .AddClientBuilderConfigurator<RabbitMqClientConfigurator>()
+            .AddSiloBuilderConfigurator<RabbitMqSiloConfigurator>();
         Cluster = builder.Build();
         Cluster.Deploy();
     }

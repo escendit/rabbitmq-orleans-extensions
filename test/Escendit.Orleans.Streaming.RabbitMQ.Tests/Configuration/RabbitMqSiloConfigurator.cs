@@ -9,7 +9,7 @@ using Options;
 /// <summary>
 /// Rabbit MQ Silo Configurator.
 /// </summary>
-public class RabbitMQSiloConfigurator : ISiloConfigurator
+public class RabbitMqSiloConfigurator : ISiloConfigurator
 {
     /// <inheritdoc />
     public void Configure(ISiloBuilder siloBuilder)
