@@ -18,12 +18,21 @@ public class RabbitMqSiloConfigurator : ISiloConfigurator
             .AddStreaming()
             .AddMemoryGrainStorageAsDefault()
             .AddRabbitMqStreaming("Default")
-            .WithStream(options =>
+            /*.WithStream(options =>
             {
                 options.Endpoints.Add(new RabbitEndpoint { HostName = "localhost", Port = 5552 });
                 options.UserName = "test";
                 options.Password = "test";
                 options.VirtualHost = "testing";
+                options.ClientProvidedName = "Silo-Stream";
+            })*/
+            .WithQueue(options =>
+            {
+                options.Endpoints.Add(new RabbitEndpoint { HostName = "localhost", Port = 5672 });
+                options.UserName = "test";
+                options.Password = "test";
+                options.VirtualHost = "testing";
+                options.ClientProvidedName = "Silo-Queue";
             });
     }
 }
