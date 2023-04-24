@@ -39,7 +39,8 @@ public static class SiloBuilderExtensions
         Action<RabbitStreamOptions>? options = null)
     {
         return builder
-            .WithStream(configure => configure.Configure(options ?? new Action<RabbitStreamOptions>(_ => { })));
+            .WithStream(configure =>
+                configure.Configure(options ?? new Action<RabbitStreamOptions>(_ => { })));
     }
 
     /// <summary>

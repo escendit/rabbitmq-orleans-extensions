@@ -28,7 +28,7 @@ public class RabbitSiloStreamConfigurator : SiloPersistentStreamConfigurator
         {
             services
                 .AddSingletonNamedService(name, DefaultStreamAdapterFactory.Create)
-                .ConfigureNamedOptionForLogging<RabbitQueueOptions>(name);
+                .ConfigureNamedOptionForLogging<RabbitStreamOptions>(name);
         });
     }
 }

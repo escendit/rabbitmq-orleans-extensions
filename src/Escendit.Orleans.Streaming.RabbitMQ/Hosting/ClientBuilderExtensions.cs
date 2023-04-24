@@ -3,8 +3,12 @@
 
 namespace Orleans.Hosting;
 
+using Configuration;
 using Escendit.Orleans.Streaming.RabbitMQ.Options;
+using Escendit.Orleans.Streaming.RabbitMQ.Stream;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 
 /// <summary>
 /// Client Builder Extensions.
@@ -28,12 +32,44 @@ public static class ClientBuilderExtensions
     /// Add Stream for Rabbit MQ.
     /// </summary>
     /// <param name="builder">The builder.</param>
+    /// <param name="options">The configure options.</param>
+    /// <returns>The rabbit client builder.</returns>
+    public static RabbitClientBuilder WithStream(
+        this RabbitClientBuilder builder,
+        Action<RabbitStreamOptions>? options = null)
+    {
+        return builder
+            .WithStream(configure =>
+                configure.Configure(options ?? new Action<RabbitStreamOptions>(_ => { })));
+    }
+
+    /// <summary>
+    /// Add Stream for Rabbit MQ.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
     /// <param name="configureOptions">The configure options.</param>
     /// <returns>The rabbit client builder.</returns>
     public static RabbitClientBuilder WithStream(
         this RabbitClientBuilder builder,
-        Action<RabbitStreamOptions> configureOptions)
+        Action<OptionsBuilder<RabbitStreamOptions>>? configureOptions = null)
     {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        builder
+            .ConfigureServices(services =>
+            {
+                services
+                    .TryAddSingleton<DefaultStreamAdapterFactory>();
+                configureOptions?
+                    .Invoke(services.AddOptions<RabbitStreamOptions>(builder.Name));
+                services
+                    .ConfigureNamedOptionForLogging<RabbitStreamOptions>(builder.Name);
+            });
+
+        _ = new RabbitClusterClientStreamConfigurator(
+            builder.Name,
+            builder);
+
         return builder;
     }
 
