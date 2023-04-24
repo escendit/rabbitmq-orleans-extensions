@@ -3,7 +3,10 @@
 
 namespace Orleans.Hosting;
 
+using Configuration;
+using Escendit.Orleans.Streaming.RabbitMQ.Options;
 using Escendit.Orleans.Streaming.RabbitMQ.Queue;
+using Runtime;
 
 /// <summary>
 /// Cluster Client Rabbit MQ Queue Configurator.
@@ -20,5 +23,19 @@ public class RabbitClusterClientQueueConfigurator : ClusterClientPersistentStrea
         IClientBuilder clientBuilder)
         : base(name, clientBuilder, DefaultQueueAdapterFactory.Create)
     {
+        ArgumentNullException.ThrowIfNull(name);
+        ArgumentNullException.ThrowIfNull(clientBuilder);
+
+        clientBuilder
+            .Services
+            .AddClientStreaming();
+
+        clientBuilder
+            .ConfigureServices(configure =>
+            {
+                configure
+                    .AddSingletonNamedService(name, DefaultQueueAdapterFactory.Create)
+                    .ConfigureNamedOptionForLogging<RabbitQueueOptions>(name);
+            });
     }
 }

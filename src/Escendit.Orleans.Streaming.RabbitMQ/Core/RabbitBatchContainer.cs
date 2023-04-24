@@ -79,4 +79,16 @@ public class RabbitBatchContainer : IBatchContainer, IComparable<RabbitBatchCont
     {
         return other?.CompareTo(this) ?? 0;
     }
+
+    /// <summary>
+    /// Update Sequence Token.
+    /// </summary>
+    /// <param name="streamSequenceToken">The stream sequence token.</param>
+    internal void UpdateSequenceToken(RabbitStreamSequenceToken streamSequenceToken)
+    {
+        _sequenceToken =
+            new RabbitStreamSequenceToken(
+                streamSequenceToken.SequenceNumber,
+                streamSequenceToken.EventIndex);
+    }
 }

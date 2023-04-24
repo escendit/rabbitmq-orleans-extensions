@@ -3,9 +3,11 @@
 
 namespace Orleans.Hosting;
 
+using Configuration;
+using Escendit.Orleans.Streaming.RabbitMQ.Options;
 using Escendit.Orleans.Streaming.RabbitMQ.Queue;
 using Microsoft.Extensions.DependencyInjection;
-using Orleans.Streams;
+using Runtime;
 
 /// <summary>
 /// Silo Rabbit MQ Queue Configurator.
@@ -22,5 +24,14 @@ public class RabbitSiloQueueConfigurator : SiloPersistentStreamConfigurator
         Action<Action<IServiceCollection>> configureDelegate)
         : base(name, configureDelegate, DefaultQueueAdapterFactory.Create)
     {
+        ArgumentNullException.ThrowIfNull(name);
+        ArgumentNullException.ThrowIfNull(configureDelegate);
+
+        ConfigureDelegate(services =>
+        {
+            services
+                .AddSingletonNamedService(name, DefaultQueueAdapterFactory.Create)
+                .ConfigureNamedOptionForLogging<RabbitQueueOptions>(name);
+        });
     }
 }

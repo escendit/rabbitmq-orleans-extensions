@@ -5,6 +5,7 @@ namespace Orleans.Hosting;
 
 using Configuration;
 using Escendit.Orleans.Streaming.RabbitMQ.Options;
+using Escendit.Orleans.Streaming.RabbitMQ.Queue;
 using Escendit.Orleans.Streaming.RabbitMQ.Stream;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -40,7 +41,8 @@ public static class ClientBuilderExtensions
     {
         return builder
             .WithStream(configure =>
-                configure.Configure(options ?? new Action<RabbitStreamOptions>(_ => { })));
+                configure
+                    .Configure(options ?? new Action<RabbitStreamOptions>(_ => { })));
     }
 
     /// <summary>
@@ -77,38 +79,45 @@ public static class ClientBuilderExtensions
     /// Add Queue for Rabbit MQ.
     /// </summary>
     /// <param name="builder">The builder.</param>
-    /// <param name="configureOptions">The configure options.</param>
+    /// <param name="options">The options.</param>
     /// <returns>The rabbit client builder.</returns>
     public static RabbitClientBuilder WithQueue(
         this RabbitClientBuilder builder,
-        Action<RabbitQueueOptions> configureOptions)
+        Action<RabbitQueueOptions>? options = null)
     {
-        builder
+        return builder
             .WithQueue(configure =>
-            {
-                configure.ConfigureDelegate(services =>
-                {
-                    services.Configure(configureOptions);
-                });
-            });
-
-        return builder;
+                configure
+                    .Configure(options ?? new Action<RabbitQueueOptions>(_ => { })));
     }
 
     /// <summary>
     /// Add Rabbit MQ Streams.
     /// </summary>
     /// <param name="builder">The builder.</param>
-    /// <param name="configure">The configure.</param>
+    /// <param name="configureOptions">The configure options.</param>
     /// <returns>The client builder.</returns>
     public static RabbitClientBuilder WithQueue(
         this RabbitClientBuilder builder,
-        Action<RabbitClusterClientStreamConfigurator>? configure = null)
+        Action<OptionsBuilder<RabbitQueueOptions>>? configureOptions = null)
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        var configurator = new RabbitClusterClientStreamConfigurator(builder.Name, builder);
-        configure?.Invoke(configurator);
+        builder
+            .ConfigureServices(services =>
+            {
+                services
+                    .TryAddSingleton<DefaultQueueAdapterFactory>();
+                configureOptions?
+                    .Invoke(services.AddOptions<RabbitQueueOptions>(builder.Name));
+                services
+                    .ConfigureNamedOptionForLogging<RabbitQueueOptions>(builder.Name);
+            });
+
+        _ = new RabbitClusterClientQueueConfigurator(
+            builder.Name,
+            builder);
+
         return builder;
     }
 }

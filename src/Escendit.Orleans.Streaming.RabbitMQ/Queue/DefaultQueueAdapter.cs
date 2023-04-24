@@ -3,14 +3,63 @@
 
 namespace Escendit.Orleans.Streaming.RabbitMQ.Queue;
 
+using Core;
 using global::Orleans.Runtime;
+using global::Orleans.Serialization;
 using global::Orleans.Streams;
+using global::RabbitMQ.Client;
+using Microsoft.Extensions.Logging;
+using Options;
 
 /// <summary>
 /// Default Queue Adapter.
 /// </summary>
-public class DefaultQueueAdapter : IQueueAdapter
+public partial class DefaultQueueAdapter : IQueueAdapter
 {
+    private readonly ILogger _logger;
+    private readonly ILoggerFactory _loggerFactory;
+    private readonly RabbitQueueOptions _options;
+    private readonly Serializer<RabbitBatchContainer> _serializer;
+    private readonly IConsistentRingStreamQueueMapper _consistentRingStreamQueueMapper;
+    private readonly IConnectionFactory _connectionFactory;
+    private readonly IConnection _connectionOutbound;
+    private readonly IModel _model;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DefaultQueueAdapter"/> class.
+    /// </summary>
+    /// <param name="name">The name.</param>
+    /// <param name="loggerFactory">The logger factory.</param>
+    /// <param name="options">The options.</param>
+    /// <param name="serializer">The serializer.</param>
+    /// <param name="consistentRingStreamQueueMapper">The consistent ring stream queue mapper.</param>
+    /// <param name="connectionFactoryFactory">The connection.</param>
+    public DefaultQueueAdapter(
+        string name,
+        ILoggerFactory loggerFactory,
+        RabbitQueueOptions options,
+        Serializer<RabbitBatchContainer> serializer,
+        IConsistentRingStreamQueueMapper consistentRingStreamQueueMapper,
+        IConnectionFactory connectionFactoryFactory)
+    {
+        ArgumentNullException.ThrowIfNull(name);
+        ArgumentNullException.ThrowIfNull(loggerFactory);
+        ArgumentNullException.ThrowIfNull(options);
+        ArgumentNullException.ThrowIfNull(serializer);
+        ArgumentNullException.ThrowIfNull(consistentRingStreamQueueMapper);
+        ArgumentNullException.ThrowIfNull(connectionFactoryFactory);
+        Name = name;
+        IsRewindable = false;
+        _loggerFactory = loggerFactory;
+        _logger = loggerFactory.CreateLogger<DefaultQueueAdapter>();
+        _options = options;
+        _serializer = serializer;
+        _consistentRingStreamQueueMapper = consistentRingStreamQueueMapper;
+        _connectionFactory = connectionFactoryFactory;
+        _connectionOutbound = _connectionFactory.CreateConnection();
+        _model = _connectionOutbound.CreateModel();
+    }
+
     /// <inheritdoc/>
     public string Name { get; }
 
@@ -18,7 +67,7 @@ public class DefaultQueueAdapter : IQueueAdapter
     public bool IsRewindable { get; }
 
     /// <inheritdoc />
-    public StreamProviderDirection Direction { get; }
+    public StreamProviderDirection Direction => StreamProviderDirection.ReadWrite;
 
     /// <inheritdoc />
     public Task QueueMessageBatchAsync<T>(
@@ -27,12 +76,55 @@ public class DefaultQueueAdapter : IQueueAdapter
         StreamSequenceToken token,
         Dictionary<string, object> requestContext)
     {
-        throw new NotImplementedException();
+        LogQueueMessageBatch(Name, streamId, token);
+
+        if (token is not null)
+        {
+            throw new InvalidOperationException("stream sequence token is not supported");
+        }
+
+        var queueId = _consistentRingStreamQueueMapper.GetQueueForStream(streamId);
+        var exchange = NamingUtility.CreateNameForQueue(Name, queueId);
+
+        var container = new RabbitBatchContainer(
+            streamId,
+            events.Cast<object>().ToList(),
+            requestContext,
+            new RabbitStreamSequenceToken(0));
+
+        var data = _serializer
+            .SerializeToArray(container);
+
+        _model.ExchangeDeclare(queueId.ToString(), ExchangeType.Direct, true);
+        _model.BasicPublish(exchange, streamId.ToString(), false, null, data);
+
+        return Task.CompletedTask;
     }
 
     /// <inheritdoc />
     public IQueueAdapterReceiver CreateReceiver(QueueId queueId)
     {
-        throw new NotImplementedException();
+        LogCreateReceiver(Name, queueId);
+        var connection = _connectionFactory.CreateConnection();
+        return new DefaultQueueAdapterReceiver(
+            Name,
+            queueId,
+            _loggerFactory,
+            _serializer,
+            connection);
     }
+
+    [LoggerMessage(
+        EventId = 100,
+        EventName = "Queue Message Batch",
+        Level = LogLevel.Debug,
+        Message = "Queueing Message Batch for ProviderName: {name}, StreamId: {streamId}, StreamSequenceToken: {sequenceToken}")]
+    private partial void LogQueueMessageBatch(string name, StreamId streamId, StreamSequenceToken sequenceToken);
+
+    [LoggerMessage(
+        EventId = 101,
+        EventName = "Create Receiver",
+        Level = LogLevel.Debug,
+        Message = "Creating Receiver for ProviderName: {name}, QueueId: {queueId}")]
+    private partial void LogCreateReceiver(string name, QueueId queueId);
 }

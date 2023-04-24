@@ -3,6 +3,7 @@
 
 namespace Orleans.Hosting;
 
+using System.Diagnostics.CodeAnalysis;
 using Configuration;
 using Escendit.Orleans.Streaming.RabbitMQ.Options;
 using Escendit.Orleans.Streaming.RabbitMQ.Stream;
@@ -13,6 +14,8 @@ using Microsoft.Extensions.Options;
 /// <summary>
 /// Silo Builder Extensions.
 /// </summary>
+[DynamicallyAccessedMembers(
+    DynamicallyAccessedMemberTypes.PublicMethods)]
 public static class SiloBuilderExtensions
 {
     /// <summary>
@@ -40,7 +43,8 @@ public static class SiloBuilderExtensions
     {
         return builder
             .WithStream(configure =>
-                configure.Configure(options ?? new Action<RabbitStreamOptions>(_ => { })));
+                configure
+                    .Configure(options ?? new Action<RabbitStreamOptions>(_ => { })));
     }
 
     /// <summary>
@@ -68,7 +72,56 @@ public static class SiloBuilderExtensions
 
         _ = new RabbitSiloStreamConfigurator(
             builder.Name,
-            configureServicesDelegate => builder.ConfigureServices(configureServicesDelegate));
+            configureServicesDelegate =>
+                builder
+                    .ConfigureServices(configureServicesDelegate));
+
+        return builder;
+    }
+
+    /// <summary>
+    /// Add Queue.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <param name="options">The options.</param>
+    /// <returns>The rabbit silo builder.</returns>
+    public static RabbitSiloBuilder WithQueue(
+        this RabbitSiloBuilder builder,
+        Action<RabbitQueueOptions>? options = null)
+    {
+        return builder
+            .WithQueue(configure =>
+                configure
+                    .Configure(options ?? new Action<RabbitQueueOptions>(_ => { })));
+    }
+
+    /// <summary>
+    /// Add Queue.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <param name="configureOptions">The configure options.</param>
+    /// <returns>The rabbit silo builder.</returns>
+    public static RabbitSiloBuilder WithQueue(
+        this RabbitSiloBuilder builder,
+        Action<OptionsBuilder<RabbitQueueOptions>>? configureOptions = null)
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+        builder
+            .ConfigureServices(services =>
+            {
+                services
+                    .TryAddSingleton<DefaultStreamAdapterFactory>();
+                configureOptions?
+                    .Invoke(services.AddOptions<RabbitQueueOptions>(builder.Name));
+                services
+                    .ConfigureNamedOptionForLogging<RabbitQueueOptions>(builder.Name);
+            });
+
+        _ = new RabbitSiloQueueConfigurator(
+            builder.Name,
+            configureServicesDelegate =>
+                builder
+                    .ConfigureServices(configureServicesDelegate));
 
         return builder;
     }
