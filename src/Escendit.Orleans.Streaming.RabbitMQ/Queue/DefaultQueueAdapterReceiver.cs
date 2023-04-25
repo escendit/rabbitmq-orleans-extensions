@@ -4,10 +4,12 @@
 namespace Escendit.Orleans.Streaming.RabbitMQ.Queue;
 
 using Core;
+using global::Orleans.Configuration;
 using global::Orleans.Serialization;
 using global::Orleans.Streams;
 using global::RabbitMQ.Client;
 using Microsoft.Extensions.Logging;
+using Options;
 
 /// <summary>
 /// Default Queue Adapter Receiver.
@@ -15,6 +17,8 @@ using Microsoft.Extensions.Logging;
 internal partial class DefaultQueueAdapterReceiver : IQueueAdapterReceiver
 {
     private readonly string _name;
+    private readonly RabbitQueueOptions _options;
+    private readonly ClusterOptions _clusterOptions;
     private readonly QueueId _queueId;
     private readonly ILogger _logger;
     private readonly Serializer<RabbitBatchContainer> _serializer;
@@ -25,12 +29,16 @@ internal partial class DefaultQueueAdapterReceiver : IQueueAdapterReceiver
     /// Initializes a new instance of the <see cref="DefaultQueueAdapterReceiver"/> class.
     /// </summary>
     /// <param name="name">The name.</param>
+    /// <param name="options">The options.</param>
+    /// <param name="clusterOptions">The cluster options.</param>
     /// <param name="queueId">The queue id.</param>
     /// <param name="loggerFactory">The logger factory.</param>
     /// <param name="serializer">The serializer.</param>
     /// <param name="connection">The connection.</param>
     public DefaultQueueAdapterReceiver(
         string name,
+        RabbitQueueOptions options,
+        ClusterOptions clusterOptions,
         QueueId queueId,
         ILoggerFactory loggerFactory,
         Serializer<RabbitBatchContainer> serializer,
@@ -41,6 +49,8 @@ internal partial class DefaultQueueAdapterReceiver : IQueueAdapterReceiver
         ArgumentNullException.ThrowIfNull(serializer);
         ArgumentNullException.ThrowIfNull(connection);
         _name = name;
+        _options = options;
+        _clusterOptions = clusterOptions;
         _queueId = queueId;
         _logger = loggerFactory.CreateLogger<DefaultQueueAdapterReceiver>();
         _serializer = serializer;
@@ -52,10 +62,10 @@ internal partial class DefaultQueueAdapterReceiver : IQueueAdapterReceiver
     {
         LogInitialize(_name, _queueId);
         _model = _connection.CreateModel();
-        var queueName = NamingUtility.CreateNameForQueue(_name, _queueId);
-        var exchangeName = NamingUtility.CreateNameForQueue(_name, _queueId);
-        _model.QueueDeclare(queueName, true, false, false);
-        _model.QueueBind(queueName, exchangeName, queueName);
+        var queueName = NamingUtility.CreateNameForQueue(_clusterOptions, _queueId);
+        _model.ExchangeDeclare(queueName, ExchangeType.Direct, _options.IsDurable);
+        _model.QueueDeclare(queueName, _options.IsDurable, false);
+        _model.QueueBind(queueName, queueName, _options.RoutingKey);
         return Task.CompletedTask;
     }
 
@@ -64,7 +74,7 @@ internal partial class DefaultQueueAdapterReceiver : IQueueAdapterReceiver
     {
         LogGetQueueMessages(_name, _queueId, maxCount);
         ArgumentNullException.ThrowIfNull(_model);
-        var queueName = NamingUtility.CreateNameForQueue(_name, _queueId);
+        var queueName = NamingUtility.CreateNameForQueue(_clusterOptions, _queueId);
         var batchContainers = new List<IBatchContainer>();
 
         while (batchContainers.Count < maxCount)
@@ -80,6 +90,7 @@ internal partial class DefaultQueueAdapterReceiver : IQueueAdapterReceiver
                     new RabbitStreamSequenceToken(
                         Convert.ToInt64(response.DeliveryTag)));
 
+                batchContainers.Add(container);
                 continue;
             }
 

@@ -4,6 +4,7 @@
 namespace Escendit.Orleans.Streaming.RabbitMQ.Queue;
 
 using Core;
+using global::Orleans.Configuration;
 using global::Orleans.Runtime;
 using global::Orleans.Serialization;
 using global::Orleans.Streams;
@@ -19,10 +20,10 @@ public partial class DefaultQueueAdapter : IQueueAdapter
     private readonly ILogger _logger;
     private readonly ILoggerFactory _loggerFactory;
     private readonly RabbitQueueOptions _options;
+    private readonly ClusterOptions _clusterOptions;
     private readonly Serializer<RabbitBatchContainer> _serializer;
     private readonly IConsistentRingStreamQueueMapper _consistentRingStreamQueueMapper;
     private readonly IConnectionFactory _connectionFactory;
-    private readonly IConnection _connectionOutbound;
     private readonly IModel _model;
 
     /// <summary>
@@ -31,6 +32,7 @@ public partial class DefaultQueueAdapter : IQueueAdapter
     /// <param name="name">The name.</param>
     /// <param name="loggerFactory">The logger factory.</param>
     /// <param name="options">The options.</param>
+    /// <param name="clusterOptions">The cluster options.</param>
     /// <param name="serializer">The serializer.</param>
     /// <param name="consistentRingStreamQueueMapper">The consistent ring stream queue mapper.</param>
     /// <param name="connectionFactoryFactory">The connection.</param>
@@ -38,6 +40,7 @@ public partial class DefaultQueueAdapter : IQueueAdapter
         string name,
         ILoggerFactory loggerFactory,
         RabbitQueueOptions options,
+        ClusterOptions clusterOptions,
         Serializer<RabbitBatchContainer> serializer,
         IConsistentRingStreamQueueMapper consistentRingStreamQueueMapper,
         IConnectionFactory connectionFactoryFactory)
@@ -53,11 +56,16 @@ public partial class DefaultQueueAdapter : IQueueAdapter
         _loggerFactory = loggerFactory;
         _logger = loggerFactory.CreateLogger<DefaultQueueAdapter>();
         _options = options;
+        _clusterOptions = clusterOptions;
         _serializer = serializer;
         _consistentRingStreamQueueMapper = consistentRingStreamQueueMapper;
         _connectionFactory = connectionFactoryFactory;
-        _connectionOutbound = _connectionFactory.CreateConnection();
-        _model = _connectionOutbound.CreateModel();
+        var connectionOutbound = _connectionFactory
+            .CreateConnection(_options
+                .Endpoints
+                .Select(endpoint => new AmqpTcpEndpoint(endpoint.HostName, endpoint.Port ?? -1))
+                .ToList());
+        _model = connectionOutbound.CreateModel();
     }
 
     /// <inheritdoc/>
@@ -84,7 +92,7 @@ public partial class DefaultQueueAdapter : IQueueAdapter
         }
 
         var queueId = _consistentRingStreamQueueMapper.GetQueueForStream(streamId);
-        var exchange = NamingUtility.CreateNameForQueue(Name, queueId);
+        var queueName = NamingUtility.CreateNameForQueue(_clusterOptions, queueId);
 
         var container = new RabbitBatchContainer(
             streamId,
@@ -95,8 +103,10 @@ public partial class DefaultQueueAdapter : IQueueAdapter
         var data = _serializer
             .SerializeToArray(container);
 
-        _model.ExchangeDeclare(queueId.ToString(), ExchangeType.Direct, true);
-        _model.BasicPublish(exchange, streamId.ToString(), false, null, data);
+        _model.ExchangeDeclare(queueName, _options.QueueType, _options.IsDurable);
+        _model.QueueDeclare(queueName, _options.IsDurable, _options.IsExclusive);
+        _model.QueueBind(queueName, queueName, _options.RoutingKey);
+        _model.BasicPublish(queueName, _options.RoutingKey, false, null, data);
 
         return Task.CompletedTask;
     }
@@ -108,6 +118,8 @@ public partial class DefaultQueueAdapter : IQueueAdapter
         var connection = _connectionFactory.CreateConnection();
         return new DefaultQueueAdapterReceiver(
             Name,
+            _options,
+            _clusterOptions,
             queueId,
             _loggerFactory,
             _serializer,

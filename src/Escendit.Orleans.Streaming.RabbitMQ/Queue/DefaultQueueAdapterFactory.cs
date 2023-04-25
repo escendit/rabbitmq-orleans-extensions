@@ -82,12 +82,10 @@ internal partial class DefaultQueueAdapterFactory : IQueueAdapterFactory
         LogCreateAdapter(_name);
         var connectionFactory = new ConnectionFactory()
         {
-            ClientProvidedName = _options.ClientProvidedName,
-            HostName = _options.Endpoints.FirstOrDefault()?.HostName,
-            Port = _options.Endpoints.FirstOrDefault()?.Port ?? 5672,
             Password = _options.Password,
             UserName = _options.UserName,
             VirtualHost = _options.VirtualHost,
+            UseBackgroundThreadsForIO = true,
         };
 
         return Task
@@ -95,6 +93,7 @@ internal partial class DefaultQueueAdapterFactory : IQueueAdapterFactory
                 _name,
                 _loggerFactory,
                 _options,
+                _clusterOptions,
                 _serializer,
                 _streamQueueMapper,
                 connectionFactory));
