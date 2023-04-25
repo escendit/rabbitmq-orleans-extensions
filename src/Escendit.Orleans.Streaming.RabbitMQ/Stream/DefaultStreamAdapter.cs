@@ -4,13 +4,13 @@
 namespace Escendit.Orleans.Streaming.RabbitMQ.Stream;
 
 using Core;
+using global::Orleans.Configuration;
 using global::Orleans.Runtime;
 using global::Orleans.Serialization;
 using global::Orleans.Streams;
 using global::RabbitMQ.Stream.Client;
 using global::RabbitMQ.Stream.Client.Reliable;
 using Microsoft.Extensions.Logging;
-using Options;
 
 /// <summary>
 /// Default Stream Adapter.
@@ -19,7 +19,7 @@ internal partial class DefaultStreamAdapter : IQueueAdapter
 {
     private readonly ILogger _logger;
     private readonly ILoggerFactory _loggerFactory;
-    private readonly RabbitStreamOptions _options;
+    private readonly ClusterOptions _clusterOptions;
     private readonly Serializer<RabbitBatchContainer> _serializer;
     private readonly IConsistentRingStreamQueueMapper _consistentRingStreamQueueMapper;
     private readonly StreamSystem _streamSystem;
@@ -29,21 +29,21 @@ internal partial class DefaultStreamAdapter : IQueueAdapter
     /// </summary>
     /// <param name="name">The name.</param>
     /// <param name="loggerFactory">The logger factory.</param>
-    /// <param name="options">The options.</param>
+    /// <param name="clusterOptions">The cluster options.</param>
     /// <param name="serializer">The serializer.</param>
     /// <param name="consistentRingStreamQueueMapper">The consistent ring stream queue mapper.</param>
     /// <param name="streamSystem">The stream system.</param>
     public DefaultStreamAdapter(
         string name,
         ILoggerFactory loggerFactory,
-        RabbitStreamOptions options,
+        ClusterOptions clusterOptions,
         Serializer<RabbitBatchContainer> serializer,
         IConsistentRingStreamQueueMapper consistentRingStreamQueueMapper,
         StreamSystem streamSystem)
     {
         _loggerFactory = loggerFactory;
         _logger = loggerFactory.CreateLogger<DefaultStreamAdapter>();
-        _options = options;
+        _clusterOptions = clusterOptions;
         _serializer = serializer;
         _consistentRingStreamQueueMapper = consistentRingStreamQueueMapper;
         Name = name;
@@ -75,7 +75,7 @@ internal partial class DefaultStreamAdapter : IQueueAdapter
         }
 
         var queueId = _consistentRingStreamQueueMapper.GetQueueForStream(streamId);
-        var streamName = NamingUtility.CreateNameForStream(Name, queueId);
+        var streamName = NamingUtility.CreateNameForStream(_clusterOptions, queueId);
 
         await _streamSystem
             .CreateStream(
@@ -105,7 +105,7 @@ internal partial class DefaultStreamAdapter : IQueueAdapter
     /// <inheritdoc/>
     public IQueueAdapterReceiver CreateReceiver(QueueId queueId)
     {
-        return new DefaultStreamAdapterReceiver(Name, queueId, _loggerFactory, _serializer, _streamSystem);
+        return new DefaultStreamAdapterReceiver(Name, _clusterOptions, queueId, _loggerFactory, _serializer, _streamSystem);
     }
 
     [LoggerMessage(

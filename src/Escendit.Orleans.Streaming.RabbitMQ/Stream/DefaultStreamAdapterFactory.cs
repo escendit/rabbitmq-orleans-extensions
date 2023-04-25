@@ -88,7 +88,7 @@ internal partial class DefaultStreamAdapterFactory : IQueueAdapterFactory
                 ClientProvidedName = _options.ClientProvidedName,
             });
 
-        return new DefaultStreamAdapter(_name, _loggerFactory, _options, _serializer, _streamQueueMapper, streamSystem);
+        return new DefaultStreamAdapter(_name, _loggerFactory, _clusterOptions, _serializer, _streamQueueMapper, streamSystem);
     }
 
     /// <inheritdoc />

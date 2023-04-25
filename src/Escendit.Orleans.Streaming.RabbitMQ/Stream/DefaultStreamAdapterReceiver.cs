@@ -5,6 +5,7 @@ namespace Escendit.Orleans.Streaming.RabbitMQ.Stream;
 
 using System.Threading.Channels;
 using Core;
+using global::Orleans.Configuration;
 using global::Orleans.Serialization;
 using global::Orleans.Streams;
 using global::RabbitMQ.Stream.Client;
@@ -17,8 +18,8 @@ internal partial class DefaultStreamAdapterReceiver : IQueueAdapterReceiver
 {
     private readonly ILogger _logger;
     private readonly string _name;
+    private readonly ClusterOptions _clusterOptions;
     private readonly QueueId _queueId;
-    private readonly ILoggerFactory _loggerFactory;
     private readonly Serializer<RabbitBatchContainer> _serializer;
     private readonly StreamSystem _streamSystem;
     private readonly Channel<RabbitBatchContainer> _inboundChannel;
@@ -28,21 +29,23 @@ internal partial class DefaultStreamAdapterReceiver : IQueueAdapterReceiver
     /// Initializes a new instance of the <see cref="DefaultStreamAdapterReceiver"/> class.
     /// </summary>
     /// <param name="name">The name.</param>
+    /// <param name="clusterOptions">The cluster options.</param>
     /// <param name="queueId">The queue id.</param>
     /// <param name="loggerFactory">The logger factory.</param>
     /// <param name="serializer">The serializer.</param>
     /// <param name="streamSystem">The stream system.</param>
     public DefaultStreamAdapterReceiver(
         string name,
+        ClusterOptions clusterOptions,
         QueueId queueId,
         ILoggerFactory loggerFactory,
         Serializer<RabbitBatchContainer> serializer,
         StreamSystem streamSystem)
     {
         _name = name;
+        _clusterOptions = clusterOptions;
         _queueId = queueId;
-        _loggerFactory = loggerFactory;
-        _logger = _loggerFactory.CreateLogger($"Escendit.Orleans.Streaming.RabbitMQ.Stream.{_queueId}");
+        _logger = loggerFactory.CreateLogger($"Escendit.Orleans.Streaming.RabbitMQ.Stream.{_queueId}");
         _serializer = serializer;
         _streamSystem = streamSystem;
         _inboundChannel = Channel.CreateBounded<RabbitBatchContainer>(16);
@@ -52,11 +55,11 @@ internal partial class DefaultStreamAdapterReceiver : IQueueAdapterReceiver
     public async Task Initialize(TimeSpan timeout)
     {
         LogInitialize(_name, _queueId);
-        var streamName = NamingUtility.CreateNameForStream(_name, _queueId);
+        var streamName = NamingUtility.CreateNameForStream(_clusterOptions, _queueId);
         _consumer = await _streamSystem
             .CreateRawConsumer(new RawConsumerConfig(streamName)
             {
-                MessageHandler = async (consumer, context, message) =>
+                MessageHandler = async (_, _, message) =>
                 {
                     LogMessageHandlerIncomingMessage(_name, _queueId, message.Data.Size);
                     await _inboundChannel.Writer.WaitToWriteAsync(); // Wait for queue
@@ -105,10 +108,14 @@ internal partial class DefaultStreamAdapterReceiver : IQueueAdapterReceiver
     }
 
     /// <inheritdoc />
-    public Task Shutdown(TimeSpan timeout)
+    public async Task Shutdown(TimeSpan timeout)
     {
         LogShutdown(_name, _queueId);
-        return _consumer!.Close();
+
+        if (_consumer is not null)
+        {
+            await _consumer.Close();
+        }
     }
 
     [LoggerMessage(
