@@ -17,16 +17,16 @@ public class RabbitMqClientConfigurator : IClientBuilderConfigurator
     {
         clientBuilder
             .AddStreaming()
-            .AddRabbitMqStreaming("Default")
-            /*.WithStream(options =>
+            /*.AddRabbitMqStreaming("Stream")
+            .WithStream(options =>
             {
                 options.Endpoints.Add(new RabbitEndpoint { HostName = "localhost", Port = 5552 });
                 options.UserName = "test";
                 options.Password = "test";
                 options.VirtualHost = "testing";
                 options.ClientProvidedName = "Client-Stream";
-            })
-            .AddRabbitMqStreaming("Queue")*/
+            })*/
+            .AddRabbitMqStreaming("Queue")
             .WithQueue(options =>
             {
                 options.Endpoints.Add(new RabbitEndpoint { HostName = "localhost", Port = 5672 });

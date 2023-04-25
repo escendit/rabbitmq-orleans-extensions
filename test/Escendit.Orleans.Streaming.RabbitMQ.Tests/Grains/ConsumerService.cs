@@ -18,7 +18,7 @@ public class ConsumerService : JournaledGrain<ConsumerState, ConsumerEvent>, ICo
     /// <inheritdoc />
     public override async Task OnActivateAsync(CancellationToken cancellationToken)
     {
-        var streamProvider = this.GetStreamProvider("Default");
+        var streamProvider = this.GetStreamProvider("Queue");
         var stream = streamProvider.GetStream<ProducerEvent>("ProducerEvent", Guid.Empty);
 
         if (_streamSubscriptionHandle is null)

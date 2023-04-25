@@ -16,7 +16,14 @@ public class ClusterFixture : IDisposable
     /// </summary>
     public ClusterFixture()
     {
-        var builder = new TestClusterBuilder();
+        var builder = new TestClusterBuilder()
+        {
+            Options =
+            {
+                ClusterId = "testCluster",
+                ServiceId = "testService",
+            },
+        };
         builder
             .AddSiloBuilderConfigurator<TestSiloConfigurator>()
             .AddClientBuilderConfigurator<RabbitMqClientConfigurator>()

@@ -15,10 +15,11 @@ public class RabbitMqSiloConfigurator : ISiloConfigurator
     public void Configure(ISiloBuilder siloBuilder)
     {
         siloBuilder
-            .AddStreaming()
             .AddMemoryGrainStorageAsDefault()
-            .AddRabbitMqStreaming("Default")
-            /*.WithStream(options =>
+            .AddMemoryGrainStorage("PubSubStore")
+            .AddStreaming()
+            /*.AddRabbitMqStreaming("Stream")
+            .WithStream(options =>
             {
                 options.Endpoints.Add(new RabbitEndpoint { HostName = "localhost", Port = 5552 });
                 options.UserName = "test";
@@ -26,6 +27,7 @@ public class RabbitMqSiloConfigurator : ISiloConfigurator
                 options.VirtualHost = "testing";
                 options.ClientProvidedName = "Silo-Stream";
             })*/
+            .AddRabbitMqStreaming("Queue")
             .WithQueue(options =>
             {
                 options.Endpoints.Add(new RabbitEndpoint { HostName = "localhost", Port = 5672 });

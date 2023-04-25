@@ -89,7 +89,7 @@ public class OrleansTests
         var producerService = _cluster.GrainFactory.GetGrain<IProducerService>(Guid.Empty);
 
         await producerService.CallAsync(1);
-        await Task.Delay(500);
+        await Task.Delay(1000);
         var otherSideValue = await consumerService.GetAsync();
 
         Assert.Equal(1, otherSideValue);
@@ -108,7 +108,7 @@ public class OrleansTests
 
         await producerService.CallAsync(1);
 
-        var streamProvider = _cluster.Client.GetStreamProvider("Default");
+        var streamProvider = _cluster.Client.GetStreamProvider("Queue");
         var stream = streamProvider.GetStream<ProducerEvent>("ProducerEvent", Guid.Empty);
 
         await stream.SubscribeAsync((@event, _) =>
