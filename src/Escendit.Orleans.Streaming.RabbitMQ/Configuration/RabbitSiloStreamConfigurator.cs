@@ -12,7 +12,7 @@ using Orleans.Runtime;
 /// <summary>
 /// Silo Rabbit MQ Stream Configurator.
 /// </summary>
-public class RabbitSiloStreamConfigurator : SiloPersistentStreamConfigurator
+internal class RabbitSiloStreamConfigurator : SiloPersistentStreamConfigurator
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="RabbitSiloStreamConfigurator"/> class.
