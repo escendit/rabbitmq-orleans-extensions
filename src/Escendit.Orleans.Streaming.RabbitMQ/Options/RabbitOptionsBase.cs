@@ -4,12 +4,15 @@
 namespace Escendit.Orleans.Streaming.RabbitMQ.Options;
 
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using global::Orleans.Configuration;
 using global::Orleans.Streams;
 
 /// <summary>
 /// Shared RabbitMQ Options.
 /// </summary>
+[DynamicallyAccessedMembers(
+    DynamicallyAccessedMemberTypes.PublicProperties)]
 public record RabbitOptionsBase
 {
     /// <summary>
@@ -51,7 +54,7 @@ public record RabbitOptionsBase
     /// Gets or sets the ssl options.
     /// </summary>
     /// <value>The ssl options.</value>
-    public RabbitSslOptions SslOptions { get; set; } = new();
+    public RabbitSslOptions? SslOptions { get; set; }
 
     /// <summary>
     /// Gets or sets the client provided name.
