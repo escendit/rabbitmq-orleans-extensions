@@ -1,12 +1,5 @@
-﻿<Project>
-    <PropertyGroup>
-        <ParentDirectoryBuildPropsPath>$([MSBuild]::GetPathOfFileAbove('Directory.Packages.props', '$(MSBuildThisFileDirectory)..\'))</ParentDirectoryBuildPropsPath>
-    </PropertyGroup>
-
-    <ImportGroup>
-        <Import Project="$(ParentDirectoryBuildPropsPath)" />
-    </ImportGroup>
-    
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>
     <ItemGroup>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.0" />
         <PackageReference Include="NSubstitute" Version="5.0.0" />
