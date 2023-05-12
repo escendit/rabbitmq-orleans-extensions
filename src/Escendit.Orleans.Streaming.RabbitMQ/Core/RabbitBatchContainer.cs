@@ -3,7 +3,6 @@
 
 namespace Escendit.Orleans.Streaming.RabbitMQ.Core;
 
-using System.Collections.ObjectModel;
 using System.Text.Json.Serialization;
 using global::Orleans;
 using global::Orleans.Runtime;
@@ -14,7 +13,7 @@ using global::Orleans.Streams;
 /// </summary>
 [Serializable]
 [GenerateSerializer]
-public class RabbitBatchContainer : IBatchContainer, IComparable<RabbitBatchContainer>
+internal class RabbitBatchContainer : IBatchContainer, IComparable<RabbitBatchContainer>
 {
     [Id(0)]
     [JsonPropertyName("sequenceToken")]
