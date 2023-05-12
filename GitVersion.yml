@@ -1,5 +1,4 @@
-mode: Mainline
 branches:
   master:
-    increment: None
+    mode: ContinuousDeployment
     tag: rc
