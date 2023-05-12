@@ -86,6 +86,20 @@ internal partial class DefaultQueueAdapterFactory : IQueueAdapterFactory
             UserName = _options.UserName,
             VirtualHost = _options.VirtualHost,
             UseBackgroundThreadsForIO = true,
+            Ssl = _options.SslOptions is null
+            ? null
+            : new SslOption
+            {
+                AcceptablePolicyErrors = _options.SslOptions.AcceptablePolicyErrors,
+                Certs = _options.SslOptions.Certificates,
+                Enabled = _options.SslOptions.Enabled,
+                Version = _options.SslOptions.Version,
+                CertPassphrase = _options.SslOptions.CertPassphrase,
+                CertPath = _options.SslOptions.CertPath,
+                ServerName = _options.SslOptions.ServerName,
+                CertificateSelectionCallback = _options.SslOptions.CertificateSelectionCallback,
+                CertificateValidationCallback = _options.SslOptions.CertificateValidationCallback,
+            },
         };
 
         return Task
