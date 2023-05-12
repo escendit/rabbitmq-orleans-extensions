@@ -43,8 +43,6 @@ public class StreamClientTests
             VirtualHost = "testing",
         });
 
-        var confirmationCount = 0;
-
         await streamSystem.CreateStream(new StreamSpec("stream.test")
         {
             MaxSegmentSizeBytes = 20_000_000,
@@ -53,26 +51,6 @@ public class StreamClientTests
         var rawProducer = await streamSystem.CreateRawProducer(new RawProducerConfig("stream.test"));
         var lastPublishingId = await rawProducer.GetLastPublishingId();
         await rawProducer.Send(lastPublishingId + 1, new Message("I AM A RAW STREAM!"u8.ToArray()));
-
-        /*var producer = await Producer.Create(new ProducerConfig(streamSystem, "stream.test")
-        {
-            ConfirmationHandler = async confirmation =>
-            {
-                switch (confirmation.Status)
-                {
-                    case ConfirmationStatus.Confirmed:
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            }
-        }, new Logger<Producer>(new NullLoggerFactory())).ConfigureAwait(false);
-
-        await producer.Send(new List<Message>
-        {
-            new("I AM A STREAM!"u8.ToArray()),
-        }).ConfigureAwait(false);
-        await producer.Close().ConfigureAwait(false);*/
         await streamSystem.Close().ConfigureAwait(false);
     }
 }
