@@ -12,7 +12,7 @@ using Runtime;
 /// <summary>
 /// Silo Rabbit MQ Queue Configurator.
 /// </summary>
-public class RabbitSiloQueueConfigurator : SiloPersistentStreamConfigurator
+internal class RabbitSiloQueueConfigurator : SiloPersistentStreamConfigurator
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="RabbitSiloQueueConfigurator"/> class.
