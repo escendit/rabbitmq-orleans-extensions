@@ -15,7 +15,7 @@ using Options;
 /// <summary>
 /// Default Queue Adapter.
 /// </summary>
-public partial class DefaultQueueAdapter : IQueueAdapter
+internal partial class DefaultQueueAdapter : IQueueAdapter
 {
     private readonly ILogger _logger;
     private readonly ILoggerFactory _loggerFactory;
@@ -60,11 +60,7 @@ public partial class DefaultQueueAdapter : IQueueAdapter
         _serializer = serializer;
         _consistentRingStreamQueueMapper = consistentRingStreamQueueMapper;
         _connectionFactory = connectionFactoryFactory;
-        var connectionOutbound = _connectionFactory
-            .CreateConnection(_options
-                .Endpoints
-                .Select(endpoint => new AmqpTcpEndpoint(endpoint.HostName, endpoint.Port ?? -1))
-                .ToList());
+        var connectionOutbound = Connect();
         _model = connectionOutbound.CreateModel();
     }
 
@@ -115,7 +111,6 @@ public partial class DefaultQueueAdapter : IQueueAdapter
     public IQueueAdapterReceiver CreateReceiver(QueueId queueId)
     {
         LogCreateReceiver(Name, queueId);
-        var connection = _connectionFactory.CreateConnection();
         return new DefaultQueueAdapterReceiver(
             Name,
             _options,
@@ -123,7 +118,19 @@ public partial class DefaultQueueAdapter : IQueueAdapter
             queueId,
             _loggerFactory,
             _serializer,
-            connection);
+            Connect());
+    }
+
+    private IConnection Connect()
+    {
+        return _connectionFactory
+            .CreateConnection(_options
+                .Endpoints
+                .Select(endpoint =>
+                    new AmqpTcpEndpoint(
+                        endpoint.HostName,
+                        endpoint.Port ?? _options.GetDefaultPort()))
+                .ToList());
     }
 
     [LoggerMessage(
