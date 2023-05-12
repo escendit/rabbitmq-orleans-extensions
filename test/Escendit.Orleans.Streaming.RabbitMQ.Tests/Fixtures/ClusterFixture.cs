@@ -3,13 +3,16 @@
 
 namespace Escendit.Orleans.Streaming.RabbitMQ.Tests.Fixtures;
 
-using Escendit.Orleans.Streaming.RabbitMQ.Tests.Configuration;
+using Configuration;
 using global::Orleans.TestingHost;
+using System.Diagnostics.CodeAnalysis;
 
 /// <summary>
 /// Cluster Fixture.
 /// </summary>
-public class ClusterFixture : IDisposable
+[DynamicallyAccessedMembers(
+    DynamicallyAccessedMemberTypes.PublicConstructors)]
+public sealed class ClusterFixture : IDisposable
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="ClusterFixture"/> class.
@@ -57,7 +60,7 @@ public class ClusterFixture : IDisposable
     /// The dispose pattern.
     /// </summary>
     /// <param name="disposing">if cleanup.</param>
-    protected virtual void Dispose(bool disposing)
+    private void Dispose(bool disposing)
     {
         if (disposing)
         {
