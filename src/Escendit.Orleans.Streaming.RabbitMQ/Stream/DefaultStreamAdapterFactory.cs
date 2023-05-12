@@ -86,6 +86,21 @@ internal partial class DefaultStreamAdapterFactory : IQueueAdapterFactory
                 UserName = _options.UserName,
                 VirtualHost = _options.VirtualHost,
                 ClientProvidedName = _options.ClientProvidedName,
+                Ssl = _options.SslOptions is null
+                ? null
+                : new SslOption
+                {
+                    AcceptablePolicyErrors = _options.SslOptions.AcceptablePolicyErrors,
+                    ServerName = _options.SslOptions.ServerName,
+                    CertificateSelectionCallback = _options.SslOptions.CertificateSelectionCallback,
+                    CertificateValidationCallback = _options.SslOptions.CertificateValidationCallback,
+                    CertPassphrase = _options.SslOptions.CertPassphrase,
+                    CertPath = _options.SslOptions.CertPath,
+                    Certs = _options.SslOptions.Certificates,
+                    CheckCertificateRevocation = _options.SslOptions.CheckCertificateRevocation,
+                    Enabled = _options.SslOptions.Enabled,
+                    Version = _options.SslOptions.Version,
+                },
             });
 
         return new DefaultStreamAdapter(_name, _loggerFactory, _clusterOptions, _serializer, _streamQueueMapper, streamSystem);
