@@ -9,7 +9,7 @@ using global::Orleans.Streams;
 /// <summary>
 /// Naming Utility.
 /// </summary>
-internal class NamingUtility
+internal static class NamingUtility
 {
     /// <summary>
     /// Create a Name for a Queue.
