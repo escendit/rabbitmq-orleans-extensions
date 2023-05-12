@@ -1,16 +1,13 @@
-﻿<Project>
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>
     <PropertyGroup>
         <ParentDirectoryBuildPropsPath>$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)..\'))</ParentDirectoryBuildPropsPath>
     </PropertyGroup>
-
     <ImportGroup>
         <Import Project="$(ParentDirectoryBuildPropsPath)" />
     </ImportGroup>
-
     <PropertyGroup>
         <IsPackable>false</IsPackable>
         <IsTestProject>true</IsTestProject>
     </PropertyGroup>
-
-    
 </Project>
