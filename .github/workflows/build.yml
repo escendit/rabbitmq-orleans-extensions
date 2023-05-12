@@ -21,7 +21,7 @@ jobs:
       - name: Build .NET Solution
         run: dotnet build --configuration Release --no-restore
       - name: Pack .NET Solution
-        run: dotnet pack --no-build --output pack/
+        run: dotnet pack --configuration Release --no-build --output pack/
       - name: Publish .NET Solution to GitHub Packages
         continue-on-error: true
         run: dotnet nuget push pack/* --api-key ${{ secrets.GITHUB_TOKEN }} --source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
