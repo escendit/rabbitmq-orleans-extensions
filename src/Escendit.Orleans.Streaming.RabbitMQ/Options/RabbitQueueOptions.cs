@@ -13,7 +13,7 @@ public record RabbitQueueOptions : RabbitOptionsBase
     /// <summary>
     /// Default Routing Key.
     /// </summary>
-    private const string DefaultRoutingKey = "stream";
+    private const string DefaultRoutingKey = "queue";
 
     /// <summary>
     /// Gets or sets the exchange type.
@@ -39,4 +39,18 @@ public record RabbitQueueOptions : RabbitOptionsBase
     /// </summary>
     /// <value>The flag if the queue is exclusive.</value>
     public bool IsExclusive { get; set; }
+
+    /// <summary>
+    /// Get Default Port.
+    /// </summary>
+    /// <returns>The port.</returns>
+    public int GetDefaultPort()
+    {
+        if (SslOptions is null)
+        {
+            return 5672;
+        }
+
+        return SslOptions.Enabled ? 5671 : 5672;
+    }
 }
