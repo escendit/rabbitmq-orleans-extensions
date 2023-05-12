@@ -11,7 +11,7 @@ using Runtime;
 /// <summary>
 /// Cluster Client RabbitMQ Stream Configurator.
 /// </summary>
-public class RabbitClusterClientStreamConfigurator : ClusterClientPersistentStreamConfigurator
+internal class RabbitClusterClientStreamConfigurator : ClusterClientPersistentStreamConfigurator
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="RabbitClusterClientStreamConfigurator"/> class.
