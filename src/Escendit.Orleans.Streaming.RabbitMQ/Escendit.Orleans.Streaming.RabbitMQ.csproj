@@ -3,7 +3,6 @@
     <PropertyGroup>
         <IsPackable>true</IsPackable>
         <Description>RabbitMQ Stream Provider for Orleans Streaming</Description>
-        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Microsoft.Orleans.Sdk" Version="7.1.2" />
