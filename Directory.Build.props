@@ -1,22 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
     <PropertyGroup>
-        <GitHubHost>https://github.com/</GitHubHost>
-        <RepositoryHost>$(GitHubHost)</RepositoryHost>
-        <RepositoryHost Condition="'$(GITHUB_ACTIONS)' == 'true'">$(GitHubHost)</RepositoryHost>
-        <RepositoryPath Condition="'$(GITHUB_REPOSITORY)' == ''">escendit/Escendit.Orleans.Streaming.RabbitMQ</RepositoryPath>
-        <RepositoryPath Condition="'$(GITHUB_REPOSITORY)' != ''">$(GITHUB_REPOSITORY)</RepositoryPath>
-    </PropertyGroup>
-    <PropertyGroup>
         <TargetFramework>net7.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
     <PropertyGroup>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    </PropertyGroup>
-    <PropertyGroup>
-        <RepositoryType>git</RepositoryType>
-        <RepositoryUrl>$(RepositoryHost)$(RepositoryPath)</RepositoryUrl>
     </PropertyGroup>
 </Project>
