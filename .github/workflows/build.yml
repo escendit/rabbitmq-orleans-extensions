@@ -1,0 +1,33 @@
+name: dotnet build
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dotnet-version: [ '7.0.x' ]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: '0'
+      - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+      - name: Restore .NET Packages
+        run: dotnet restore
+      - name: Build .NET Solution
+        run: dotnet build --configuration Release --no-restore
+      - name: Pack .NET Solution
+        run: dotnet pack --configuration Release --no-build --output pack/
+      - name: Publish .NET Solution to GitHub Packages
+        continue-on-error: true
+        run: dotnet nuget push pack/* --api-key ${{ secrets.GITHUB_TOKEN }} --source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
+      - name: Publish .NET Solution to NuGet.org
+        env:
+          apikey: ${{ secrets.NUGET_ORG_KEY }} 
+        if: ${{ env.apikey != '' }}
+        run: dotnet nuget push pack/* --api-key ${{ secrets.NUGET_ORG_KEY }} --source nuget
+        continue-on-error: true
