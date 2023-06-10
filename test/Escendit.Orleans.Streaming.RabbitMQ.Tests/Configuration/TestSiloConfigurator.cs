@@ -3,8 +3,10 @@
 
 namespace Escendit.Orleans.Streaming.RabbitMQ.Tests.Configuration;
 
-using global::Orleans.TestingHost;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using global::Orleans.TestingHost;
+using Options;
 
 /// <summary>
 /// Test Silo Configurator.
@@ -28,5 +30,17 @@ public class TestSiloConfigurator : ISiloConfigurator
         siloBuilder
             .AddMemoryGrainStorageAsDefault()
             .AddLogStorageBasedLogConsistencyProviderAsDefault();
+
+        siloBuilder
+            .Services
+            .AddRabbitMq("custom", options =>
+            {
+                options.Endpoints.Add(new RabbitEndpoint { HostName = "localhost", Port = 5672 });
+                options.UserName = "test";
+                options.Password = "test";
+                options.VirtualHost = "testing";
+                options.ClientProvidedName = "Custom-Connection";
+            })
+            .WithConnection();
     }
 }
