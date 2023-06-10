@@ -27,6 +27,7 @@ public class QueueClientTests
             VirtualHost = "testing",
             UserName = "test",
             Password = "test",
+            ClientProvidedName = "queue-client-test",
         };
 
         var connection = connectionFactory.CreateConnection();
