@@ -6,6 +6,7 @@ namespace Orleans.Hosting;
 using Configuration;
 using Escendit.Orleans.Streaming.RabbitMQ.Options;
 using Escendit.Orleans.Streaming.RabbitMQ.Queue;
+using Microsoft.Extensions.DependencyInjection;
 using Runtime;
 
 /// <summary>
@@ -35,7 +36,9 @@ internal class RabbitClusterClientQueueConfigurator : ClusterClientPersistentStr
             {
                 configure
                     .AddSingletonNamedService(name, DefaultQueueAdapterFactory.Create)
-                    .ConfigureNamedOptionForLogging<RabbitQueueOptions>(name);
+                    .ConfigureNamedOptionForLogging<RabbitQueueOptions>(name)
+                    .AddRabbitMq(name)
+                    .WithConnection();
             });
     }
 }
