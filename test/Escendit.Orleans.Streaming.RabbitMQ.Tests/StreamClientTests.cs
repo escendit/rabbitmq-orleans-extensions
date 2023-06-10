@@ -41,6 +41,7 @@ public class StreamClientTests
             UserName = "test",
             Password = "test",
             VirtualHost = "testing",
+            ClientProvidedName = "stream-client-test",
         });
 
         await streamSystem.CreateStream(new StreamSpec("stream.test")
