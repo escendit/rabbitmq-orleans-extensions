@@ -5,6 +5,8 @@ that integrates RabbitMQ with [Orleans](https://github.com/dotnet/orleans) Strea
 
 The Library contains 2 different ways of streaming, first via Stream Protocol, and other via AMQP protocol.
 
+The Library provides named connections to Rabbit MQ, which can be used for low-level integration events.
+
 ## Installation
 
 To install Escendit.Orleans.Streaming.RabbitMQ, run the following command in the Package Manager Console:
@@ -144,6 +146,60 @@ var hostBuilder = Host
     })
 ```
 
+### Low Level Registration
+
+You can register the Rabbit MQ Classic Client, but the name must not conflict with the Orleans Streaming Provider.
+
+#### SiloBuilder
+
+```csharp
+var hostBuilder = Host
+    .CreateDefaultBuilder()
+    .UseOrleans(builder =>
+    {
+        builder
+            .Configure<ClusterOptions>(options =>
+            {
+                options.ClusterId = "cluster-id";
+                options.ServiceId = "service-id";
+            })
+            .ConfigureServices(services => services
+                .AddRabbitMq("ProviderName", options =>
+                {
+                    options.Endpoints.Add(new RabbitEndpoint { HostName = "localhost", Port = 5672 });
+                    options.UserName = "guest";
+                    options.Password = "guest";
+                    options.VirtualHost = "/";
+                })
+                .WithConnection());
+    });
+```
+
+#### ClientBuilder
+
+```csharp
+var hostBuilder = Host
+    .CreateDefaultBuilder()
+    .UseOrleansClient(builder =>
+    {
+        builder
+            .Configure<ClusterOptions>(options =>
+            {
+                options.ClusterId = "cluster-id";
+                options.ServiceId = "service-id";
+            })
+            .ConfigureServices(services => services
+                .AddRabbitMq("ProviderName", options =>
+                {
+                    options.Endpoints.Add(new RabbitEndpoint { HostName = "localhost", Port = 5672 });
+                    options.UserName = "guest";
+                    options.Password = "guest";
+                    options.VirtualHost = "/";
+                })
+                .WithConnection());          
+    })
+```
+
 ## Consume
 
 Create a stream:
@@ -169,6 +225,19 @@ public class MyGrain : Grain, IMyGrain
     public Task ReceiveMessage(Event @event)
     {
         // Receive a message.
+    }
+}
+```
+
+Create a low-level connection:
+
+```csharp
+public class MyService : GrainService
+{
+    private readonly IConnection _connection;
+    public MyService(string name, IServiceProvider serviceProvider)
+    {
+        _connection = serviceProvider.GetRequiredServiceByName<IConnection>(name);
     }
 }
 ```
