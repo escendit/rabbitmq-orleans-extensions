@@ -23,45 +23,46 @@ internal partial class DefaultQueueAdapter : IQueueAdapter
     private readonly ClusterOptions _clusterOptions;
     private readonly Serializer<RabbitBatchContainer> _serializer;
     private readonly IConsistentRingStreamQueueMapper _consistentRingStreamQueueMapper;
-    private readonly IConnectionFactory _connectionFactory;
-    private readonly IModel _model;
+    private readonly IModel _publisherChannel;
+    private readonly IModel _consumerChannel;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DefaultQueueAdapter"/> class.
     /// </summary>
     /// <param name="name">The name.</param>
+    /// <param name="connection">The connection.</param>
     /// <param name="loggerFactory">The logger factory.</param>
     /// <param name="options">The options.</param>
     /// <param name="clusterOptions">The cluster options.</param>
     /// <param name="serializer">The serializer.</param>
     /// <param name="consistentRingStreamQueueMapper">The consistent ring stream queue mapper.</param>
-    /// <param name="connectionFactoryFactory">The connection.</param>
     public DefaultQueueAdapter(
         string name,
+        IConnection connection,
         ILoggerFactory loggerFactory,
         RabbitQueueOptions options,
         ClusterOptions clusterOptions,
         Serializer<RabbitBatchContainer> serializer,
-        IConsistentRingStreamQueueMapper consistentRingStreamQueueMapper,
-        IConnectionFactory connectionFactoryFactory)
+        IConsistentRingStreamQueueMapper consistentRingStreamQueueMapper)
     {
         ArgumentNullException.ThrowIfNull(name);
         ArgumentNullException.ThrowIfNull(loggerFactory);
         ArgumentNullException.ThrowIfNull(options);
         ArgumentNullException.ThrowIfNull(serializer);
         ArgumentNullException.ThrowIfNull(consistentRingStreamQueueMapper);
-        ArgumentNullException.ThrowIfNull(connectionFactoryFactory);
+
         Name = name;
         IsRewindable = false;
+
         _loggerFactory = loggerFactory;
         _logger = loggerFactory.CreateLogger<DefaultQueueAdapter>();
         _options = options;
         _clusterOptions = clusterOptions;
         _serializer = serializer;
         _consistentRingStreamQueueMapper = consistentRingStreamQueueMapper;
-        _connectionFactory = connectionFactoryFactory;
-        var connectionOutbound = Connect();
-        _model = connectionOutbound.CreateModel();
+        _publisherChannel = connection.CreateModel();
+        _consumerChannel = connection.CreateModel();
+        _publisherChannel.ExchangeDeclare(NamingUtility.CreateNameForQueue(_clusterOptions, _options.Name), _options.Type, _options.IsDurable);
     }
 
     /// <inheritdoc/>
@@ -89,6 +90,7 @@ internal partial class DefaultQueueAdapter : IQueueAdapter
 
         var queueId = _consistentRingStreamQueueMapper.GetQueueForStream(streamId);
         var queueName = NamingUtility.CreateNameForQueue(_clusterOptions, queueId);
+        var exchangeName = NamingUtility.CreateNameForQueue(_clusterOptions, _options.Name);
 
         var container = new RabbitBatchContainer(
             streamId,
@@ -99,10 +101,7 @@ internal partial class DefaultQueueAdapter : IQueueAdapter
         var data = _serializer
             .SerializeToArray(container);
 
-        _model.ExchangeDeclare(queueName, _options.QueueType, _options.IsDurable);
-        _model.QueueDeclare(queueName, _options.IsDurable, _options.IsExclusive);
-        _model.QueueBind(queueName, queueName, _options.RoutingKey);
-        _model.BasicPublish(queueName, _options.RoutingKey, false, null, data);
+        _publisherChannel.BasicPublish(exchangeName, queueName, false, null, data);
 
         return Task.CompletedTask;
     }
@@ -118,19 +117,7 @@ internal partial class DefaultQueueAdapter : IQueueAdapter
             queueId,
             _loggerFactory,
             _serializer,
-            Connect());
-    }
-
-    private IConnection Connect()
-    {
-        return _connectionFactory
-            .CreateConnection(_options
-                .Endpoints
-                .Select(endpoint =>
-                    new AmqpTcpEndpoint(
-                        endpoint.HostName,
-                        endpoint.Port ?? _options.GetDefaultPort()))
-                .ToList());
+            _consumerChannel);
     }
 
     [LoggerMessage(

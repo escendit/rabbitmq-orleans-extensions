@@ -7,6 +7,7 @@ using Core;
 using global::Orleans.Configuration;
 using global::Orleans.Configuration.Overrides;
 using global::Orleans.Providers.Streams.Common;
+using global::Orleans.Runtime;
 using global::Orleans.Serialization;
 using global::Orleans.Streams;
 using global::RabbitMQ.Client;
@@ -25,6 +26,7 @@ internal partial class DefaultQueueAdapterFactory : IQueueAdapterFactory
     private readonly ILoggerFactory _loggerFactory;
     private readonly ILogger _logger;
     private readonly string _name;
+    private readonly IConnection _connection;
     private readonly RabbitQueueOptions _options;
     private readonly ClusterOptions _clusterOptions;
     private readonly Serializer<RabbitBatchContainer> _serializer;
@@ -36,18 +38,21 @@ internal partial class DefaultQueueAdapterFactory : IQueueAdapterFactory
     /// Initializes a new instance of the <see cref="DefaultQueueAdapterFactory"/> class.
     /// </summary>
     /// <param name="name">The name.</param>
+    /// <param name="connection">The connection.</param>
     /// <param name="options">The options.</param>
     /// <param name="clusterOptions">The cluster options.</param>
     /// <param name="serializer">The serializer.</param>
     /// <param name="loggerFactory">The logger factory.</param>
     public DefaultQueueAdapterFactory(
         string name,
+        IConnection connection,
         RabbitQueueOptions options,
         ClusterOptions clusterOptions,
         Serializer serializer,
         ILoggerFactory loggerFactory)
     {
         ArgumentNullException.ThrowIfNull(name);
+        ArgumentNullException.ThrowIfNull(connection);
         ArgumentNullException.ThrowIfNull(options);
         ArgumentNullException.ThrowIfNull(clusterOptions);
         ArgumentNullException.ThrowIfNull(serializer);
@@ -56,6 +61,7 @@ internal partial class DefaultQueueAdapterFactory : IQueueAdapterFactory
         _loggerFactory = loggerFactory;
         _logger = _loggerFactory.CreateLogger<DefaultStreamAdapterFactory>();
         _name = name;
+        _connection = connection;
         _options = options;
         _clusterOptions = clusterOptions;
         _serializer = serializer.GetSerializer<RabbitBatchContainer>();
@@ -80,37 +86,16 @@ internal partial class DefaultQueueAdapterFactory : IQueueAdapterFactory
     public Task<IQueueAdapter> CreateAdapter()
     {
         LogCreateAdapter(_name);
-        var connectionFactory = new ConnectionFactory()
-        {
-            Password = _options.Password,
-            UserName = _options.UserName,
-            VirtualHost = _options.VirtualHost,
-            UseBackgroundThreadsForIO = true,
-            Ssl = _options.SslOptions is null
-            ? null
-            : new SslOption
-            {
-                AcceptablePolicyErrors = _options.SslOptions.AcceptablePolicyErrors,
-                Certs = _options.SslOptions.Certificates,
-                Enabled = _options.SslOptions.Enabled,
-                Version = _options.SslOptions.Version,
-                CertPassphrase = _options.SslOptions.CertPassphrase,
-                CertPath = _options.SslOptions.CertPath,
-                ServerName = _options.SslOptions.ServerName,
-                CertificateSelectionCallback = _options.SslOptions.CertificateSelectionCallback,
-                CertificateValidationCallback = _options.SslOptions.CertificateValidationCallback,
-            },
-        };
 
         return Task
             .FromResult<IQueueAdapter>(new DefaultQueueAdapter(
                 _name,
+                _connection,
                 _loggerFactory,
                 _options,
                 _clusterOptions,
                 _serializer,
-                _streamQueueMapper,
-                connectionFactory));
+                _streamQueueMapper));
     }
 
     /// <inheritdoc />
@@ -144,12 +129,15 @@ internal partial class DefaultQueueAdapterFactory : IQueueAdapterFactory
     {
         ArgumentNullException.ThrowIfNull(serviceProvider);
         ArgumentNullException.ThrowIfNull(name);
-        var options = serviceProvider.GetOptionsByName<RabbitQueueOptions>(name);
         var clusterOptions = serviceProvider.GetProviderClusterOptions(name);
+        var options = serviceProvider.GetOptionsByName<RabbitQueueOptions>(name);
+        var connection = serviceProvider.GetRequiredServiceByName<IConnection>(name);
+
         return ActivatorUtilities
             .CreateInstance<DefaultQueueAdapterFactory>(
                 serviceProvider,
                 name,
+                connection,
                 options,
                 clusterOptions.Value);
     }

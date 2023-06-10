@@ -22,8 +22,7 @@ internal partial class DefaultQueueAdapterReceiver : IQueueAdapterReceiver
     private readonly QueueId _queueId;
     private readonly ILogger _logger;
     private readonly Serializer<RabbitBatchContainer> _serializer;
-    private readonly IConnection _connection;
-    private IModel? _model;
+    private readonly IModel _channel;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DefaultQueueAdapterReceiver"/> class.
@@ -34,7 +33,7 @@ internal partial class DefaultQueueAdapterReceiver : IQueueAdapterReceiver
     /// <param name="queueId">The queue id.</param>
     /// <param name="loggerFactory">The logger factory.</param>
     /// <param name="serializer">The serializer.</param>
-    /// <param name="connection">The connection.</param>
+    /// <param name="channel">The channel.</param>
     public DefaultQueueAdapterReceiver(
         string name,
         RabbitQueueOptions options,
@@ -42,30 +41,29 @@ internal partial class DefaultQueueAdapterReceiver : IQueueAdapterReceiver
         QueueId queueId,
         ILoggerFactory loggerFactory,
         Serializer<RabbitBatchContainer> serializer,
-        IConnection connection)
+        IModel channel)
     {
         ArgumentNullException.ThrowIfNull(name);
         ArgumentNullException.ThrowIfNull(loggerFactory);
         ArgumentNullException.ThrowIfNull(serializer);
-        ArgumentNullException.ThrowIfNull(connection);
+        ArgumentNullException.ThrowIfNull(channel);
         _name = name;
         _options = options;
         _clusterOptions = clusterOptions;
         _queueId = queueId;
         _logger = loggerFactory.CreateLogger<DefaultQueueAdapterReceiver>();
         _serializer = serializer;
-        _connection = connection;
+        _channel = channel;
     }
 
     /// <inheritdoc/>
     public Task Initialize(TimeSpan timeout)
     {
         LogInitialize(_name, _queueId);
-        _model = _connection.CreateModel();
         var queueName = NamingUtility.CreateNameForQueue(_clusterOptions, _queueId);
-        _model.ExchangeDeclare(queueName, ExchangeType.Direct, _options.IsDurable);
-        _model.QueueDeclare(queueName, _options.IsDurable, false);
-        _model.QueueBind(queueName, queueName, _options.RoutingKey);
+        var exchangeName = NamingUtility.CreateNameForQueue(_clusterOptions, _options.Name);
+        _channel.QueueDeclare(queueName, _options.IsDurable, _options.IsExclusive);
+        _channel.QueueBind(queueName, exchangeName, queueName);
         return Task.CompletedTask;
     }
 
@@ -73,13 +71,13 @@ internal partial class DefaultQueueAdapterReceiver : IQueueAdapterReceiver
     public Task<IList<IBatchContainer>> GetQueueMessagesAsync(int maxCount)
     {
         LogGetQueueMessages(_name, _queueId, maxCount);
-        ArgumentNullException.ThrowIfNull(_model);
+        ArgumentNullException.ThrowIfNull(_channel);
         var queueName = NamingUtility.CreateNameForQueue(_clusterOptions, _queueId);
         var batchContainers = new List<IBatchContainer>();
 
         while (batchContainers.Count < maxCount)
         {
-            var response = _model.BasicGet(queueName, false);
+            var response = _channel.BasicGet(queueName, false);
 
             if (response is not null)
             {
@@ -105,10 +103,10 @@ internal partial class DefaultQueueAdapterReceiver : IQueueAdapterReceiver
     public Task MessagesDeliveredAsync(IList<IBatchContainer> messages)
     {
         LogMessagesDelivered(_name, _queueId, messages.Count);
-        ArgumentNullException.ThrowIfNull(_model);
+
         foreach (var batchContainer in messages)
         {
-            _model.BasicAck(Convert.ToUInt64(batchContainer.SequenceToken.SequenceNumber), false);
+            _channel.BasicAck(Convert.ToUInt64(batchContainer.SequenceToken.SequenceNumber), false);
         }
 
         return Task.CompletedTask;
@@ -118,12 +116,6 @@ internal partial class DefaultQueueAdapterReceiver : IQueueAdapterReceiver
     public Task Shutdown(TimeSpan timeout)
     {
         LogShutdown(_name, _queueId);
-        ArgumentNullException.ThrowIfNull(_model);
-        if (!_model.IsClosed)
-        {
-            _model.Close();
-        }
-
         return Task.CompletedTask;
     }
 

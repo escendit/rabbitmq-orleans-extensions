@@ -3,30 +3,33 @@
 
 namespace Escendit.Orleans.Streaming.RabbitMQ.Options;
 
+using System.Diagnostics.CodeAnalysis;
 using global::RabbitMQ.Client;
 
 /// <summary>
 /// Rabbit MQ Stream Provider Options.
 /// </summary>
+[DynamicallyAccessedMembers(
+    DynamicallyAccessedMemberTypes.PublicProperties)]
 public record RabbitQueueOptions : RabbitOptionsBase
 {
     /// <summary>
-    /// Default Routing Key.
+    /// Default Exchange Key.
     /// </summary>
-    private const string DefaultRoutingKey = "queue";
+    private const string DefaultExchangekey = "exchange";
 
     /// <summary>
     /// Gets or sets the exchange type.
     /// </summary>
     /// <para>The default is <see cref="ExchangeType.Direct"/>.</para>
     /// <value>The exchange type.</value>
-    public string QueueType { get; set; } = ExchangeType.Direct;
+    public string Type { get; set; } = ExchangeType.Topic;
 
     /// <summary>
-    /// Gets or sets the routing key.
+    /// Gets or sets the exchange name.
     /// </summary>
-    /// <value>The routing key.</value>
-    public string RoutingKey { get; set; } = DefaultRoutingKey;
+    /// <value>The exchange name.</value>
+    public string Name { get; set; } = DefaultExchangekey;
 
     /// <summary>
     /// Gets or sets a value indicating whether the queue is durable.
@@ -41,16 +44,19 @@ public record RabbitQueueOptions : RabbitOptionsBase
     public bool IsExclusive { get; set; }
 
     /// <summary>
-    /// Get Default Port.
+    /// Gets the default Port.
     /// </summary>
-    /// <returns>The port.</returns>
-    public int GetDefaultPort()
+    /// <value>The default port.</value>
+    public int DefaultPort
     {
-        if (SslOptions is null)
+        get
         {
-            return 5672;
-        }
+            if (SslOptions is null)
+            {
+                return 5672;
+            }
 
-        return SslOptions.Enabled ? 5671 : 5672;
+            return SslOptions.Enabled ? 5671 : 5672;
+        }
     }
 }
