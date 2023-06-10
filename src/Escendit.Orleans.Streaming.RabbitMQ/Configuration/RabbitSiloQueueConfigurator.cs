@@ -31,7 +31,9 @@ internal class RabbitSiloQueueConfigurator : SiloPersistentStreamConfigurator
         {
             services
                 .AddSingletonNamedService(name, DefaultQueueAdapterFactory.Create)
-                .ConfigureNamedOptionForLogging<RabbitQueueOptions>(name);
+                .ConfigureNamedOptionForLogging<RabbitQueueOptions>(name)
+                .AddRabbitMq(name)
+                .WithConnection();
         });
     }
 }
