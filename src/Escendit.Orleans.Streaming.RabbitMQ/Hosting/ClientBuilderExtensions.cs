@@ -3,17 +3,19 @@
 
 namespace Orleans.Hosting;
 
+using System.Diagnostics.CodeAnalysis;
 using Configuration;
 using Escendit.Orleans.Streaming.RabbitMQ.Options;
 using Escendit.Orleans.Streaming.RabbitMQ.Queue;
 using Escendit.Orleans.Streaming.RabbitMQ.Stream;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Options;
 
 /// <summary>
 /// Client Builder Extensions.
 /// </summary>
+[DynamicallyAccessedMembers(
+    DynamicallyAccessedMemberTypes.All)]
 public static class ClientBuilderExtensions
 {
     /// <summary>
@@ -30,94 +32,144 @@ public static class ClientBuilderExtensions
     }
 
     /// <summary>
-    /// Add Stream for Rabbit MQ.
+    /// Add Stream System.
     /// </summary>
-    /// <param name="builder">The builder.</param>
-    /// <param name="options">The configure options.</param>
-    /// <returns>The rabbit client builder.</returns>
+    /// <param name="clientBuilder">The initial client builder.</param>
+    /// <returns>The updated client builder.</returns>
     public static RabbitClientBuilder WithStream(
-        this RabbitClientBuilder builder,
-        Action<RabbitStreamOptions>? options = null)
+        this RabbitClientBuilder clientBuilder)
     {
-        return builder
-            .WithStream(configure =>
-                configure
-                    .Configure(options ?? new Action<RabbitStreamOptions>(_ => { })));
+        ArgumentNullException.ThrowIfNull(clientBuilder);
+        return clientBuilder
+            .WithStream(_ => { });
     }
 
     /// <summary>
     /// Add Stream for Rabbit MQ.
     /// </summary>
-    /// <param name="builder">The builder.</param>
-    /// <param name="configureOptions">The configure options.</param>
+    /// <param name="clientBuilder">The builder.</param>
+    /// <param name="streamOptions">The configure options.</param>
     /// <returns>The rabbit client builder.</returns>
     public static RabbitClientBuilder WithStream(
-        this RabbitClientBuilder builder,
-        Action<OptionsBuilder<RabbitStreamOptions>>? configureOptions = null)
+        this RabbitClientBuilder clientBuilder,
+        Action<RabbitStreamOptions> streamOptions)
     {
-        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentNullException.ThrowIfNull(clientBuilder);
 
-        builder
+        clientBuilder
             .ConfigureServices(services =>
             {
+                var rabbitStreamOptions = new RabbitStreamOptions();
+
+                streamOptions.Invoke(rabbitStreamOptions);
+
                 services
+                    .AddOptions<RabbitStreamOptions>(clientBuilder.Name)
+                    .Configure(streamOptions);
+
+                services
+                    .AddOptions<RabbitOptionsBase>(clientBuilder.Name)
+                    .Configure(options =>
+                    {
+                        options.CacheSize = rabbitStreamOptions.CacheSize;
+                        options.ClientProvidedName = rabbitStreamOptions.ClientProvidedName;
+                        options.Endpoints.Clear();
+
+                        foreach (var endpoint in rabbitStreamOptions.Endpoints)
+                        {
+                            options.Endpoints.Add(endpoint);
+                        }
+
+                        options.Heartbeat = rabbitStreamOptions.Heartbeat;
+                        options.Password = rabbitStreamOptions.Password;
+                        options.SslOptions = rabbitStreamOptions.SslOptions;
+                        options.StreamFailureHandlerFactory = rabbitStreamOptions.StreamFailureHandlerFactory;
+                        options.TotalQueueCount = rabbitStreamOptions.TotalQueueCount;
+                        options.UserName = rabbitStreamOptions.UserName;
+                        options.VirtualHost = rabbitStreamOptions.VirtualHost;
+                    });
+
+                services
+                    .ConfigureNamedOptionForLogging<RabbitStreamOptions>(clientBuilder.Name)
+                    .ConfigureNamedOptionForLogging<RabbitOptionsBase>(clientBuilder.Name)
                     .TryAddSingleton<DefaultStreamAdapterFactory>();
-                configureOptions?
-                    .Invoke(services.AddOptions<RabbitStreamOptions>(builder.Name));
-                services
-                    .ConfigureNamedOptionForLogging<RabbitStreamOptions>(builder.Name);
             });
 
         _ = new RabbitClusterClientStreamConfigurator(
-            builder.Name,
-            builder);
+            clientBuilder.Name,
+            clientBuilder);
 
-        return builder;
+        return clientBuilder;
+    }
+
+    /// <summary>
+    /// Add Classic Queue System.
+    /// </summary>
+    /// <param name="clientBuilder">The initial client builder.</param>
+    /// <returns>The updated client builder.</returns>
+    public static RabbitClientBuilder WithQueue(
+        this RabbitClientBuilder clientBuilder)
+    {
+        ArgumentNullException.ThrowIfNull(clientBuilder);
+        return clientBuilder
+            .WithQueue(_ => { });
     }
 
     /// <summary>
     /// Add Queue for Rabbit MQ.
     /// </summary>
-    /// <param name="builder">The builder.</param>
-    /// <param name="options">The options.</param>
+    /// <param name="clientBuilder">The builder.</param>
+    /// <param name="queueOptions">The options.</param>
     /// <returns>The rabbit client builder.</returns>
     public static RabbitClientBuilder WithQueue(
-        this RabbitClientBuilder builder,
-        Action<RabbitQueueOptions>? options = null)
+        this RabbitClientBuilder clientBuilder,
+        Action<RabbitQueueOptions> queueOptions)
     {
-        return builder
-            .WithQueue(configure =>
-                configure
-                    .Configure(options ?? new Action<RabbitQueueOptions>(_ => { })));
-    }
+        ArgumentNullException.ThrowIfNull(clientBuilder);
 
-    /// <summary>
-    /// Add Rabbit MQ Streams.
-    /// </summary>
-    /// <param name="builder">The builder.</param>
-    /// <param name="configureOptions">The configure options.</param>
-    /// <returns>The client builder.</returns>
-    public static RabbitClientBuilder WithQueue(
-        this RabbitClientBuilder builder,
-        Action<OptionsBuilder<RabbitQueueOptions>>? configureOptions = null)
-    {
-        ArgumentNullException.ThrowIfNull(builder);
-
-        builder
+        clientBuilder
             .ConfigureServices(services =>
             {
+                var rabbitQueueOptions = new RabbitQueueOptions();
+
+                queueOptions.Invoke(rabbitQueueOptions);
+
                 services
-                    .TryAddSingleton<DefaultQueueAdapterFactory>();
-                configureOptions?
-                    .Invoke(services.AddOptions<RabbitQueueOptions>(builder.Name));
+                    .AddOptions<RabbitQueueOptions>(clientBuilder.Name)
+                    .Configure(queueOptions);
+
                 services
-                    .ConfigureNamedOptionForLogging<RabbitQueueOptions>(builder.Name);
+                    .AddOptions<RabbitOptionsBase>(clientBuilder.Name)
+                    .Configure(options =>
+                    {
+                        options.CacheSize = rabbitQueueOptions.CacheSize;
+                        options.ClientProvidedName = rabbitQueueOptions.ClientProvidedName;
+                        options.Endpoints.Clear();
+
+                        foreach (var endpoint in rabbitQueueOptions.Endpoints)
+                        {
+                            options.Endpoints.Add(endpoint);
+                        }
+
+                        options.Heartbeat = rabbitQueueOptions.Heartbeat;
+                        options.Password = rabbitQueueOptions.Password;
+                        options.SslOptions = rabbitQueueOptions.SslOptions;
+                        options.StreamFailureHandlerFactory = rabbitQueueOptions.StreamFailureHandlerFactory;
+                        options.TotalQueueCount = rabbitQueueOptions.TotalQueueCount;
+                        options.UserName = rabbitQueueOptions.UserName;
+                        options.VirtualHost = rabbitQueueOptions.VirtualHost;
+                    });
+
+                services
+                    .ConfigureNamedOptionForLogging<RabbitQueueOptions>(clientBuilder.Name)
+                    .ConfigureNamedOptionForLogging<RabbitOptionsBase>(clientBuilder.Name)
+                    .TryAddSingleton<DefaultQueueAdapter>();
             });
 
         _ = new RabbitClusterClientQueueConfigurator(
-            builder.Name,
-            builder);
+            clientBuilder.Name,
+            clientBuilder);
 
-        return builder;
+        return clientBuilder;
     }
 }

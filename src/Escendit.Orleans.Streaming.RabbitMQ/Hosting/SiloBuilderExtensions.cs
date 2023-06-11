@@ -6,16 +6,16 @@ namespace Orleans.Hosting;
 using System.Diagnostics.CodeAnalysis;
 using Configuration;
 using Escendit.Orleans.Streaming.RabbitMQ.Options;
+using Escendit.Orleans.Streaming.RabbitMQ.Queue;
 using Escendit.Orleans.Streaming.RabbitMQ.Stream;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Options;
 
 /// <summary>
 /// Silo Builder Extensions.
 /// </summary>
 [DynamicallyAccessedMembers(
-    DynamicallyAccessedMemberTypes.PublicMethods)]
+    DynamicallyAccessedMemberTypes.All)]
 public static class SiloBuilderExtensions
 {
     /// <summary>
@@ -32,97 +32,149 @@ public static class SiloBuilderExtensions
     }
 
     /// <summary>
-    /// Add Stream.
+    /// Add Stream System.
     /// </summary>
-    /// <param name="builder">The builder.</param>
-    /// <param name="options">The options.</param>
-    /// <returns>The rabbit silo builder.</returns>
+    /// <param name="siloBuilder">The initial silo builder.</param>
+    /// <returns>The updated silo builder.</returns>
     public static RabbitSiloBuilder WithStream(
-        this RabbitSiloBuilder builder,
-        Action<RabbitStreamOptions>? options = null)
+        this RabbitSiloBuilder siloBuilder)
     {
-        return builder
-            .WithStream(configure =>
-                configure
-                    .Configure(options ?? new Action<RabbitStreamOptions>(_ => { })));
+        ArgumentNullException.ThrowIfNull(siloBuilder);
+        return siloBuilder
+            .WithStream(_ => { });
     }
 
     /// <summary>
     /// Add Stream.
     /// </summary>
-    /// <param name="builder">The builder.</param>
-    /// <param name="configureOptions">The configure options.</param>
-    /// <returns>The rabbit silo builder.</returns>
+    /// <param name="siloBuilder">The initial silo builder.</param>
+    /// <param name="streamOptions">The options.</param>
+    /// <returns>The updated silo builder.</returns>
     public static RabbitSiloBuilder WithStream(
-        this RabbitSiloBuilder builder,
-        Action<OptionsBuilder<RabbitStreamOptions>>? configureOptions = null)
+        this RabbitSiloBuilder siloBuilder,
+        Action<RabbitStreamOptions> streamOptions)
     {
-        ArgumentNullException.ThrowIfNull(builder);
-        builder
+        ArgumentNullException.ThrowIfNull(siloBuilder);
+        ArgumentNullException.ThrowIfNull(streamOptions);
+        siloBuilder
             .ConfigureServices(services =>
             {
-                services
-                    .TryAddSingleton<DefaultStreamAdapterFactory>();
-                configureOptions?
-                    .Invoke(services.AddOptions<RabbitStreamOptions>(builder.Name));
+                var rabbitStreamOptions = new RabbitStreamOptions();
+
+                streamOptions.Invoke(rabbitStreamOptions);
 
                 services
-                    .ConfigureNamedOptionForLogging<RabbitStreamOptions>(builder.Name);
+                    .AddOptions<RabbitStreamOptions>(siloBuilder.Name)
+                    .Configure(streamOptions);
+
+                services
+                    .AddOptions<RabbitOptionsBase>(siloBuilder.Name)
+                    .Configure(options =>
+                    {
+                        options.CacheSize = rabbitStreamOptions.CacheSize;
+                        options.ClientProvidedName = rabbitStreamOptions.ClientProvidedName;
+                        options.Endpoints.Clear();
+
+                        foreach (var endpoint in rabbitStreamOptions.Endpoints)
+                        {
+                            options.Endpoints.Add(endpoint);
+                        }
+
+                        options.Heartbeat = rabbitStreamOptions.Heartbeat;
+                        options.Password = rabbitStreamOptions.Password;
+                        options.SslOptions = rabbitStreamOptions.SslOptions;
+                        options.StreamFailureHandlerFactory = rabbitStreamOptions.StreamFailureHandlerFactory;
+                        options.TotalQueueCount = rabbitStreamOptions.TotalQueueCount;
+                        options.UserName = rabbitStreamOptions.UserName;
+                        options.VirtualHost = rabbitStreamOptions.VirtualHost;
+                    });
+
+                services
+                    .ConfigureNamedOptionForLogging<RabbitStreamOptions>(siloBuilder.Name)
+                    .ConfigureNamedOptionForLogging<RabbitOptionsBase>(siloBuilder.Name)
+                    .TryAddSingleton<DefaultStreamAdapterFactory>();
             });
 
         _ = new RabbitSiloStreamConfigurator(
-            builder.Name,
+            siloBuilder.Name,
             configureServicesDelegate =>
-                builder
+                siloBuilder
                     .ConfigureServices(configureServicesDelegate));
 
-        return builder;
+        return siloBuilder;
     }
 
     /// <summary>
-    /// Add Queue.
+    /// Add Classic Queue System.
     /// </summary>
-    /// <param name="builder">The builder.</param>
-    /// <param name="options">The options.</param>
-    /// <returns>The rabbit silo builder.</returns>
+    /// <param name="siloBuilder">The initial silo builder.</param>
+    /// <returns>The updated silo builder.</returns>
     public static RabbitSiloBuilder WithQueue(
-        this RabbitSiloBuilder builder,
-        Action<RabbitQueueOptions>? options = null)
+        this RabbitSiloBuilder siloBuilder)
     {
-        return builder
-            .WithQueue(configure =>
-                configure
-                    .Configure(options ?? new Action<RabbitQueueOptions>(_ => { })));
+        ArgumentNullException.ThrowIfNull(siloBuilder);
+        return siloBuilder
+            .WithQueue(_ => { });
     }
 
     /// <summary>
-    /// Add Queue.
+    /// Add Classic Queue System.
     /// </summary>
-    /// <param name="builder">The builder.</param>
-    /// <param name="configureOptions">The configure options.</param>
+    /// <param name="siloBuilder">The initial silo builder.</param>
+    /// <param name="queueOptions">The queue options.</param>
     /// <returns>The rabbit silo builder.</returns>
     public static RabbitSiloBuilder WithQueue(
-        this RabbitSiloBuilder builder,
-        Action<OptionsBuilder<RabbitQueueOptions>>? configureOptions = null)
+        this RabbitSiloBuilder siloBuilder,
+        Action<RabbitQueueOptions> queueOptions)
     {
-        ArgumentNullException.ThrowIfNull(builder);
-        builder
+        ArgumentNullException.ThrowIfNull(siloBuilder);
+        ArgumentNullException.ThrowIfNull(queueOptions);
+
+        siloBuilder
             .ConfigureServices(services =>
             {
+                var rabbitQueueOptions = new RabbitQueueOptions();
+
+                queueOptions.Invoke(rabbitQueueOptions);
+
                 services
-                    .TryAddSingleton<DefaultStreamAdapterFactory>();
-                configureOptions?
-                    .Invoke(services.AddOptions<RabbitQueueOptions>(builder.Name));
+                    .AddOptions<RabbitQueueOptions>(siloBuilder.Name)
+                    .Configure(queueOptions);
+
                 services
-                    .ConfigureNamedOptionForLogging<RabbitQueueOptions>(builder.Name);
+                    .AddOptions<RabbitOptionsBase>(siloBuilder.Name)
+                    .Configure(options =>
+                    {
+                        options.CacheSize = rabbitQueueOptions.CacheSize;
+                        options.ClientProvidedName = rabbitQueueOptions.ClientProvidedName;
+                        options.Endpoints.Clear();
+
+                        foreach (var endpoint in rabbitQueueOptions.Endpoints)
+                        {
+                            options.Endpoints.Add(endpoint);
+                        }
+
+                        options.Heartbeat = rabbitQueueOptions.Heartbeat;
+                        options.Password = rabbitQueueOptions.Password;
+                        options.SslOptions = rabbitQueueOptions.SslOptions;
+                        options.StreamFailureHandlerFactory = rabbitQueueOptions.StreamFailureHandlerFactory;
+                        options.TotalQueueCount = rabbitQueueOptions.TotalQueueCount;
+                        options.UserName = rabbitQueueOptions.UserName;
+                        options.VirtualHost = rabbitQueueOptions.VirtualHost;
+                    });
+
+                services
+                    .ConfigureNamedOptionForLogging<RabbitQueueOptions>(siloBuilder.Name)
+                    .ConfigureNamedOptionForLogging<RabbitOptionsBase>(siloBuilder.Name)
+                    .TryAddSingleton<DefaultQueueAdapterFactory>();
             });
 
         _ = new RabbitSiloQueueConfigurator(
-            builder.Name,
+            siloBuilder.Name,
             configureServicesDelegate =>
-                builder
+                siloBuilder
                     .ConfigureServices(configureServicesDelegate));
 
-        return builder;
+        return siloBuilder;
     }
 }

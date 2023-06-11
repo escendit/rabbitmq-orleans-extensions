@@ -12,7 +12,7 @@ using System.Security.Cryptography.X509Certificates;
 /// Rabbit SSL Option.
 /// </summary>
 [DynamicallyAccessedMembers(
-    DynamicallyAccessedMemberTypes.PublicProperties)]
+    DynamicallyAccessedMemberTypes.All)]
 public class RabbitSslOptions
 {
     /// <summary>
