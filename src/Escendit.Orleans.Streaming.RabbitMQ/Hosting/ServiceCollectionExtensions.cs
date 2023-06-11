@@ -45,7 +45,7 @@ public static class ServiceCollectionExtensions
     public static IRabbitConnectionFactoryBuilder AddRabbitMq(
         this IServiceCollection services,
         string name,
-        Action<RabbitQueueOptions> options)
+        Action<RabbitOptionsBase> options)
     {
         ArgumentNullException.ThrowIfNull(services);
         ArgumentNullException.ThrowIfNull(options);
@@ -69,17 +69,17 @@ public static class ServiceCollectionExtensions
     public static IRabbitConnectionFactoryBuilder AddRabbitMq(
         this IServiceCollection services,
         string name,
-        Action<OptionsBuilder<RabbitQueueOptions>> configureOptions)
+        Action<OptionsBuilder<RabbitOptionsBase>> configureOptions)
     {
         ArgumentNullException.ThrowIfNull(services);
         ArgumentNullException.ThrowIfNull(name);
         ArgumentNullException.ThrowIfNull(configureOptions);
 
         configureOptions
-            .Invoke(services.AddOptions<RabbitQueueOptions>(name));
+            .Invoke(services.AddOptions<RabbitOptionsBase>(name));
 
         services
-            .ConfigureNamedOptionForLogging<RabbitQueueOptions>(name)
+            .ConfigureNamedOptionForLogging<RabbitOptionsBase>(name)
             .AddRabbitNamedConnectionFactory(name);
         return new RabbitConnectionFactoryBuilder(services, name);
     }
@@ -113,7 +113,7 @@ public static class ServiceCollectionExtensions
                 name,
                 (serviceProvider, providerName) =>
                 {
-                    var options = serviceProvider.GetOptionsByName<RabbitQueueOptions>(providerName);
+                    var options = serviceProvider.GetOptionsByName<RabbitOptionsBase>(providerName);
                     return new ConnectionFactory
                     {
                         Password = options.Password,
@@ -152,7 +152,7 @@ public static class ServiceCollectionExtensions
         return services
             .AddSingletonNamedService<IConnection>(name, (serviceProvider, providerName) =>
             {
-                var options = serviceProvider.GetOptionsByName<RabbitQueueOptions>(providerName);
+                var options = serviceProvider.GetOptionsByName<RabbitOptionsBase>(providerName);
                 var clusterOptions = serviceProvider.GetRequiredService<IOptions<ClusterOptions>>();
                 var connectionFactory = serviceProvider.GetRequiredServiceByName<IConnectionFactory>(providerName);
                 var clusterId = clusterOptions.Value.ClusterId;
@@ -167,7 +167,7 @@ public static class ServiceCollectionExtensions
                                     .Select(endpoint =>
                                         new AmqpTcpEndpoint(
                                             endpoint.HostName,
-                                            endpoint.Port ?? options.DefaultPort))
+                                            endpoint.Port ?? 5672))
                                     .ToList(),
                                 $"queue-client-{clusterId}-{serviceId}-{name}"))
                     .ConfigureAwait(false)
