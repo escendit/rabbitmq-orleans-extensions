@@ -3,11 +3,11 @@
 
 namespace Orleans.Hosting;
 
+using Configuration;
 using Escendit.Orleans.Streaming.RabbitMQ.Options;
 using Escendit.Orleans.Streaming.RabbitMQ.Stream;
 using Microsoft.Extensions.DependencyInjection;
-using Orleans.Configuration;
-using Orleans.Runtime;
+using Runtime;
 
 /// <summary>
 /// Silo Rabbit MQ Stream Configurator.
