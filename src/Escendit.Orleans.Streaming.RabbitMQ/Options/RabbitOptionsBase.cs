@@ -12,7 +12,7 @@ using global::Orleans.Streams;
 /// Shared RabbitMQ Options.
 /// </summary>
 [DynamicallyAccessedMembers(
-    DynamicallyAccessedMemberTypes.PublicProperties)]
+    DynamicallyAccessedMemberTypes.All)]
 public record RabbitOptionsBase
 {
     /// <summary>
