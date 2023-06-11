@@ -120,6 +120,7 @@ public static class ServiceCollectionExtensions
                         UserName = options.UserName,
                         VirtualHost = options.VirtualHost,
                         UseBackgroundThreadsForIO = true,
+                        DispatchConsumersAsync = true,
                         Ssl = options.SslOptions is null
                             ? null
                             : new SslOption
