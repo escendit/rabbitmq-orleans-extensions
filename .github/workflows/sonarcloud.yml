@@ -53,5 +53,5 @@ jobs:
         run: |
           .\.sonar\scanner\dotnet-sonarscanner begin /k:"escendit_Escendit.Orleans.Streaming.RabbitMQ" /o:"escendit" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
           dotnet build --configuration Release
-          dotnet test --configuration Release --no-build --filter=Category=UnitTest --logger "trx;LogFileName=test-results.trx"
+          dotnet test --configuration Release --no-build --filter=Category=UnitTest --collect "Code Coverage" --logger "trx;LogFileName=test-results.trx"
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
