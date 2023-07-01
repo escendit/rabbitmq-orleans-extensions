@@ -51,7 +51,21 @@ jobs:
         if: ${{ env.SONAR_TOKEN != null }}
         shell: powershell
         run: |
-          .\.sonar\scanner\dotnet-sonarscanner begin /k:"escendit_Escendit.Orleans.Streaming.RabbitMQ" /o:"escendit" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
+          .\.sonar\scanner\dotnet-sonarscanner begin `
+            /k:"escendit_Escendit.Orleans.Streaming.RabbitMQ" `
+            /o:"escendit" `
+            /d:sonar.login="${{ secrets.SONAR_TOKEN }}" `
+            /d:sonar.host.url="https://sonarcloud.io" `
+            /d:sonar.cs.vstest.reportsPaths=**/TestResults/*.trx `
+            /d:sonar.cs.opencover.reportsPaths=**/TestResults/*/coverage.opencover.xml `
+            /d:sonar.coverage.exclusions="**Test*.cs"
           dotnet build --configuration Release
-          dotnet test --configuration Release --no-build --filter=Category=UnitTest --collect "Code Coverage" --logger "trx;LogFileName=test-results.trx"
+          dotnet test `
+            --configuration Release `
+            --no-build `
+            --filter=Category=UnitTest `
+            --collect "XPlat Code Coverage" `
+            --results-directory TestResults/ `
+            --logger "trx;LogFileName=test-results.trx" `
+            -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
