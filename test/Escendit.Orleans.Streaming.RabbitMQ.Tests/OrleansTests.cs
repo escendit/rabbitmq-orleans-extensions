@@ -33,7 +33,7 @@ public class OrleansTests
     /// </summary>
     /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
     [Fact]
-    [UnitTest]
+    [IntegrationTest]
     public async Task ClientActionAsync()
     {
         var producerService = _cluster.Client.GetGrain<IProducerService>(Guid.Empty);
@@ -47,7 +47,7 @@ public class OrleansTests
     /// </summary>
     /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
     [Fact]
-    [UnitTest]
+    [IntegrationTest]
     public async Task SiloActionAsync()
     {
         // Method intentionally left empty.
