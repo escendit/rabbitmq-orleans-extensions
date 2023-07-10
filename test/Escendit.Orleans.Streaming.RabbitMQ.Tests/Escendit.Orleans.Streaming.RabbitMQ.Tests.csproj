@@ -3,7 +3,7 @@
     <ItemGroup>
       <PackageReference Include="Microsoft.Orleans.EventSourcing" Version="7.1.2" />
       <PackageReference Include="Microsoft.Orleans.Sdk" Version="7.1.2" />
-      <PackageReference Include="Microsoft.Orleans.TestingHost" Version="7.1.2" />
+      <PackageReference Include="Microsoft.Orleans.TestingHost" Version="7.2.0" />
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\..\src\Escendit.Orleans.Streaming.RabbitMQ\Escendit.Orleans.Streaming.RabbitMQ.csproj" />
