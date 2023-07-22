@@ -91,8 +91,7 @@ public static class ClientBuilderExtensions
 
                 services
                     .ConfigureNamedOptionForLogging<RabbitStreamOptions>(clientBuilder.Name)
-                    .ConfigureNamedOptionForLogging<RabbitOptionsBase>(clientBuilder.Name)
-                    .TryAddSingleton<DefaultStreamAdapterFactory>();
+                    .ConfigureNamedOptionForLogging<RabbitOptionsBase>(clientBuilder.Name);
             });
 
         _ = new RabbitClusterClientStreamConfigurator(
@@ -162,8 +161,7 @@ public static class ClientBuilderExtensions
 
                 services
                     .ConfigureNamedOptionForLogging<RabbitQueueOptions>(clientBuilder.Name)
-                    .ConfigureNamedOptionForLogging<RabbitOptionsBase>(clientBuilder.Name)
-                    .TryAddSingleton<DefaultQueueAdapter>();
+                    .ConfigureNamedOptionForLogging<RabbitOptionsBase>(clientBuilder.Name);
             });
 
         _ = new RabbitClusterClientQueueConfigurator(
