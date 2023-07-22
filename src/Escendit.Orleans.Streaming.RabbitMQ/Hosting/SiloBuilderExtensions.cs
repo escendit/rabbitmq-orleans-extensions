@@ -164,8 +164,7 @@ public static class SiloBuilderExtensions
 
                 services
                     .ConfigureNamedOptionForLogging<RabbitQueueOptions>(siloBuilder.Name)
-                    .ConfigureNamedOptionForLogging<RabbitOptionsBase>(siloBuilder.Name)
-                    .TryAddSingleton<DefaultQueueAdapterFactory>();
+                    .ConfigureNamedOptionForLogging<RabbitOptionsBase>(siloBuilder.Name);
             });
 
         _ = new RabbitSiloQueueConfigurator(
