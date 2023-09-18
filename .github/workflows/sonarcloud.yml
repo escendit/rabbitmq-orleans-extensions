@@ -60,7 +60,7 @@ jobs:
         shell: powershell
         run: |
           .\.sonar\scanner\dotnet-sonarscanner begin `
-            /k:"escendit_Escendit.Orleans.Streaming.RabbitMQ" `
+            /k:"escendit_rabbitmq-orleans-extensions" `
             /o:"escendit" `
             /v:${{ env.GitVersion_FullSemVer }} `
             /d:sonar.login="${{ secrets.SONAR_TOKEN }}" `
