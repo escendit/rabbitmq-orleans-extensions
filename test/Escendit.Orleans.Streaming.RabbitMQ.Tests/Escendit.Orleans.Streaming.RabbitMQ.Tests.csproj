@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <ItemGroup>
       <PackageReference Include="Microsoft.Orleans.EventSourcing" Version="7.1.2" />
-      <PackageReference Include="Microsoft.Orleans.Sdk" Version="7.1.2" />
+      <PackageReference Include="Microsoft.Orleans.Sdk" Version="7.2.1" />
       <PackageReference Include="Microsoft.Orleans.TestingHost" Version="7.1.2" />
     </ItemGroup>
     <ItemGroup>
