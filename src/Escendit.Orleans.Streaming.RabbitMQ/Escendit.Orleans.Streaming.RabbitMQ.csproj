@@ -5,7 +5,7 @@
         <Description>RabbitMQ Stream Provider for Orleans Streaming</Description>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Microsoft.Orleans.Sdk" Version="7.1.2" />
+        <PackageReference Include="Microsoft.Orleans.Sdk" Version="7.2.2" />
         <PackageReference Include="Microsoft.Orleans.Streaming" Version="7.1.2" />
         <PackageReference Include="RabbitMQ.Client" Version="6.5.0" />
         <PackageReference Include="RabbitMQ.Stream.Client" Version="1.7.1" />
