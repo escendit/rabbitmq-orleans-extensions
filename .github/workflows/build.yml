@@ -1,40 +1,42 @@
-name: dotnet build
-
-on: [push]
-
+name: build
+on:
+  push:
+  pull_request:
+    types: [opened, synchronize, reopened]
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        dotnet-version: [ '7.0.x' ]
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: '0'
-      - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
+      - name: Setup .NET Core SDK 7, 8
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: ${{ matrix.dotnet-version }}
+          dotnet-version: |
+            7.0.x
+            8.0.x
       - name: Restore .NET Packages
         run: dotnet restore
       - name: Build .NET Solution
         run: dotnet build --configuration Release --no-restore
       - name: Test .NET Solution
-        run: dotnet test --configuration Release --no-build --filter=Category=UnitTest --logger "trx;LogFileName=test-results.trx"
+        run: dotnet test --configuration Release --no-build --filter=Category=UnitTest --logger "trx;LogFilePrefix=test-results"
       - uses: actions/upload-artifact@v2
         if: success() || failure()
         with:
           name: test-results
-          path: "**/test-results.trx"
+          path: "**/test-results*.trx"
       - name: Pack .NET Solution
         run: dotnet pack --configuration Release --no-build --output pack/
+        if: ${{ github.event_name != 'pull_request' && github.ref_name == 'main' }}
       - name: Publish .NET Solution to GitHub Packages
         continue-on-error: true
-        run: dotnet nuget push pack/* --api-key ${{ secrets.GITHUB_TOKEN }} --source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
+        run: dotnet nuget push pack/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
+        if: ${{ github.event_name != 'pull_request' && github.ref_name == 'main' }}
       - name: Publish .NET Solution to NuGet.org
         env:
-          apikey: ${{ secrets.NUGET_ORG_KEY }} 
-        if: ${{ env.apikey != '' }}
-        run: dotnet nuget push pack/* --api-key ${{ secrets.NUGET_ORG_KEY }} --source nuget
+          apikey: ${{ secrets.NUGET_ORG_KEY }}
+        if: ${{ env.apikey != '' && github.event_name != 'pull_request' && github.ref_name == 'main' }}
+        run: dotnet nuget push pack/*.nupkg --api-key ${{ secrets.NUGET_ORG_KEY }} --source nuget
         continue-on-error: true
