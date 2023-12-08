@@ -4,7 +4,6 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 jobs:
-  
   build:
     runs-on: ubuntu-latest
     steps:
@@ -27,7 +26,7 @@ jobs:
         if: success() || failure()
         with:
           name: test-results
-          path: "**/test-results-*.trx"
+          path: "**/test-results*.trx"
       - name: Pack .NET Solution
         run: dotnet pack --configuration Release --no-build --output pack/
         if: ${{ github.event_name != 'pull_request' && github.ref_name == 'main' }}
