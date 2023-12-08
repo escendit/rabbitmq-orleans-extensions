@@ -1,9 +1,8 @@
-name: dotnet test report
+name: report
 on:
   workflow_run:
-    workflows: ['dotnet build']
-    types:
-      - completed
+    workflows: [build]
+    types: [completed]
 jobs:
   report:
     runs-on: ubuntu-latest
@@ -12,5 +11,5 @@ jobs:
         with:
           artifact: test-results
           name: dotnet tests
-          path: '**/test-results.trx'
+          path: '**/test-results*.trx'
           reporter: dotnet-trx

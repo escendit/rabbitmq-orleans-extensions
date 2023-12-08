@@ -1,6 +1,33 @@
 version: 2
 updates:
-  - package-ecosystem: "nuget"
-    directory: "/"
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: 
+      interval: daily
+  - package-ecosystem: nuget
+    directory: /
     schedule:
-      interval: "weekly"
+      interval: daily
+    labels:
+      - dependencies
+    groups:
+      tools:
+        patterns:
+          - Escendit.Tools.*
+      gitversion:
+        patterns:
+          - GitVersion.MsBuild
+      orleans:
+        patterns:
+          - Microsoft.Orleans.*
+        update-types:
+          - minor
+          - patch
+      extensions:
+        patterns:
+          - Escendit.AspNetCore.Builder.RabbitMQ.*
+          - Escendit.Extensions.DependencyInjection.RabbitMQ.*
+          - Escendit.Extensions.Hosting.RabbitMQ.*
+        update-types:
+          - minor
+          - patch
