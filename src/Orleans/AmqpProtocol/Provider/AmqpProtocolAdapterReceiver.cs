@@ -51,7 +51,7 @@ internal partial class AmqpProtocolAdapterReceiver : IQueueAdapterReceiver
         _queueOptions = queueOptions;
         _clusterOptions = clusterOptions;
         _queueId = queueId;
-        _logger = loggerFactory.CreateLogger<AmqpProtocolAdapterReceiver>();
+        _logger = loggerFactory.CreateLogger($"Escendit.Orleans.Streaming.RabbitMQ.AmqpProtocol.{_queueId}");
         _serializer = serializer;
         _channel = channel;
     }
@@ -83,11 +83,7 @@ internal partial class AmqpProtocolAdapterReceiver : IQueueAdapterReceiver
             {
                 LogMessageHandlerIncomingMessage(_name, _queueId, response.Body.Length);
                 var container = _serializer.Deserialize(response.Body);
-
-                container.UpdateSequenceToken(
-                    new RabbitMqStreamSequenceToken(
-                        Convert.ToInt64(response.DeliveryTag)));
-
+                container.UpdateDeliveryTag(response.DeliveryTag);
                 batchContainers.Add(container);
                 continue;
             }
@@ -104,9 +100,12 @@ internal partial class AmqpProtocolAdapterReceiver : IQueueAdapterReceiver
     {
         LogMessagesDelivered(_name, _queueId, messages.Count);
 
-        foreach (var batchContainer in messages)
+        foreach (var deliveryTag in messages.Cast<RabbitMqBatchContainer>().Select(s => s.DeliveryTag))
         {
-            _channel.BasicAck(Convert.ToUInt64(batchContainer.SequenceToken.SequenceNumber), false);
+            if (deliveryTag.HasValue)
+            {
+                _channel.BasicAck(deliveryTag.Value, false);
+            }
         }
 
         return Task.CompletedTask;

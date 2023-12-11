@@ -79,12 +79,11 @@ internal partial class AmqpProtocolAdapter : IQueueAdapter
     public Task QueueMessageBatchAsync<T>(
         StreamId streamId,
         IEnumerable<T> events,
-        StreamSequenceToken token,
+        StreamSequenceToken? token,
         Dictionary<string, object> requestContext)
     {
         ArgumentNullException.ThrowIfNull(streamId);
         ArgumentNullException.ThrowIfNull(events);
-        ArgumentNullException.ThrowIfNull(requestContext);
         LogQueueMessageBatch(Name, streamId, token);
 
         var queueId = _streamQueueMapper.GetQueueForStream(streamId);
@@ -95,12 +94,12 @@ internal partial class AmqpProtocolAdapter : IQueueAdapter
             streamId,
             events.Cast<object>().ToList(),
             requestContext,
-            new RabbitMqStreamSequenceToken(token));
+            token is null ? default : new RabbitMqStreamSequenceToken(token));
 
         var data = _serializer
             .SerializeToArray(container);
 
-        _publisherChannel.BasicPublish(exchangeName, queueName, false, null, data);
+        _publisherChannel.BasicPublish(exchangeName, queueName, false, default, data);
 
         return Task.CompletedTask;
     }
@@ -124,7 +123,7 @@ internal partial class AmqpProtocolAdapter : IQueueAdapter
         EventName = "Queue Message Batch",
         Level = LogLevel.Debug,
         Message = "Queueing Message Batch for ProviderName: {name}, StreamId: {streamId}, StreamSequenceToken: {sequenceToken}")]
-    private partial void LogQueueMessageBatch(string name, StreamId streamId, StreamSequenceToken sequenceToken);
+    private partial void LogQueueMessageBatch(string name, StreamId streamId, StreamSequenceToken? sequenceToken);
 
     [LoggerMessage(
         EventId = 101,

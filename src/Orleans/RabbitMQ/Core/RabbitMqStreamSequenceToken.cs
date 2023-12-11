@@ -10,6 +10,9 @@ using global::Orleans.Streams;
 /// <summary>
 /// Escendit.Orleans.Streaming.RabbitMQ.Tests Stream Sequence Token.
 /// </summary>
+[GenerateSerializer]
+[Serializable]
+[Alias("rabbitmq-stream-sequence-token")]
 public class RabbitMqStreamSequenceToken : StreamSequenceToken
 {
     [Id(0)]
@@ -26,7 +29,7 @@ public class RabbitMqStreamSequenceToken : StreamSequenceToken
     /// <param name="sequenceNumber">The sequence number.</param>
     /// <param name="eventIndex">The event index.</param>
     [JsonConstructor]
-    public RabbitMqStreamSequenceToken(long sequenceNumber, int eventIndex = 0)
+    public RabbitMqStreamSequenceToken(long sequenceNumber, int eventIndex)
     {
         _sequenceNumber = sequenceNumber;
         _eventIndex = eventIndex;
@@ -44,9 +47,20 @@ public class RabbitMqStreamSequenceToken : StreamSequenceToken
     }
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="RabbitMqStreamSequenceToken"/> class.
+    /// </summary>
+    /// <param name="sequenceNumber">The sequence number.</param>
+    public RabbitMqStreamSequenceToken(ulong sequenceNumber)
+    {
+        _sequenceNumber = Convert.ToInt64(sequenceNumber);
+        _eventIndex = 0;
+    }
+
+    /// <summary>
     /// Gets or sets the sequence number.
     /// </summary>
     /// <value>The sequence number.</value>
+    [JsonIgnore]
     public override long SequenceNumber
     {
         get => _sequenceNumber;
@@ -57,6 +71,7 @@ public class RabbitMqStreamSequenceToken : StreamSequenceToken
     /// Gets or sets the event index.
     /// </summary>
     /// <value>The event index.</value>
+    [JsonIgnore]
     public override int EventIndex
     {
         get => _eventIndex;

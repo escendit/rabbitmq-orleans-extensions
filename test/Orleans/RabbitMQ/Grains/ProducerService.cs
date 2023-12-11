@@ -27,7 +27,7 @@ public class ProducerService : JournaledGrain<ProducerState, ProducerEvent>, IPr
     public async Task CallAsync(int newValue, GrainCancellationToken? cancellationToken = default)
     {
         _logger.LogDebug("Call");
-        var streamProvider = this.GetStreamProvider("Queue");
+        var streamProvider = this.GetStreamProvider("silo");
         var stream = streamProvider.GetStream<ProducerEvent>("ProducerEvent", Guid.Empty);
 
         var @event = new ProducerEvent

@@ -31,8 +31,8 @@ public class RabbitMqSiloConfigurator : ISiloConfigurator
                     Port = 5672,
                 });
             })
-            .AddHashRingStreamQueueMapper(_ => { })
-            .AddSimpleQueueCache(_ => { })
+            .AddHashRingStreamQueueMapper()
+            .AddSimpleQueueCache()
             .Build();
     }
 }

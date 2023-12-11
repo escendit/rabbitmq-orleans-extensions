@@ -65,10 +65,22 @@ public static class ClientBuilderExtensions
         ArgumentNullException.ThrowIfNull(configureOptions);
         clientBuilder
             .ConfigureServices(services => services
-                .AddOrleansNamedSingletonFactory(clientBuilder.Name, ServiceProviderExtensions.CreateStreamQueueMapper)
+                .AddOrleansNamedSingletonFactory(clientBuilder.Name, ServiceProviderExtensions.CreateDefaultStreamQueueMapper)
                 .AddOptions<HashRingStreamQueueMapperOptions>(clientBuilder.Name)
                 .Configure(configureOptions));
         return clientBuilder;
+    }
+
+    /// <summary>
+    /// Add Hash Ring Stream Queue Mapper.
+    /// </summary>
+    /// <param name="clientBuilder">The client builder.</param>
+    /// <returns>The rabbitmq client options builder.</returns>
+    public static IRabbitMqClientOptionsBuilder AddHashRingStreamQueueMapper(
+        this IRabbitMqClientOptionsBuilder clientBuilder)
+    {
+        ArgumentNullException.ThrowIfNull(clientBuilder);
+        return AddHashRingStreamQueueMapper(clientBuilder, _ => { });
     }
 
     /// <summary>
@@ -89,7 +101,7 @@ public static class ClientBuilderExtensions
     }
 
     /// <summary>
-    /// Add Hash Ring Stream Queue Mapper.
+    /// Add Simple Queue Cache.
     /// </summary>
     /// <param name="clientBuilder">The client builder.</param>
     /// <param name="configureOptions">The configure options.</param>
@@ -102,9 +114,21 @@ public static class ClientBuilderExtensions
         ArgumentNullException.ThrowIfNull(configureOptions);
         clientBuilder
             .ConfigureServices(services => services
-                .AddOrleansNamedSingletonFactory(clientBuilder.Name, ServiceProviderExtensions.CreateQueueAdapterCache)
+                .AddOrleansNamedSingletonFactory(clientBuilder.Name, ServiceProviderExtensions.CreateDefaultQueueAdapterCache)
                 .AddOptions<SimpleQueueCacheOptions>(clientBuilder.Name)
                 .Configure(configureOptions));
         return clientBuilder;
+    }
+
+    /// <summary>
+    /// Add Simple Queue Cache.
+    /// </summary>
+    /// <param name="clientBuilder">The client builder.</param>
+    /// <returns>The rabbitmq client options builder.</returns>
+    public static IRabbitMqClientOptionsBuilder AddSimpleQueueCache(
+        this IRabbitMqClientOptionsBuilder clientBuilder)
+    {
+        ArgumentNullException.ThrowIfNull(clientBuilder);
+        return AddSimpleQueueCache(clientBuilder, _ => { });
     }
 }

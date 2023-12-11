@@ -6,6 +6,7 @@ namespace Escendit.Orleans.Streaming.RabbitMQ.Tests.Grains;
 /// <summary>
 /// Consumer Service.
 /// </summary>
+[Alias("consumer")]
 public interface IConsumerService : IGrainWithGuidKey
 {
     /// <summary>
@@ -13,5 +14,6 @@ public interface IConsumerService : IGrainWithGuidKey
     /// </summary>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
+    [Alias("get")]
     Task<int> GetAsync(GrainCancellationToken? cancellationToken = default);
 }

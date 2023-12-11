@@ -73,7 +73,7 @@ public class SiloBuilderTestss
         var producerService = _cluster.Client.GetGrain<IProducerService>(Guid.Empty);
 
         await producerService.CallAsync(1);
-        await Task.Delay(500);
+        await Task.Delay(1500);
         var otherSideValue = await consumerService.GetAsync();
 
         Assert.Equal(1, otherSideValue);
@@ -107,15 +107,12 @@ public class SiloBuilderTestss
     {
         var consumerService = _cluster.Client.GetGrain<IConsumerService>(Guid.Empty);
         var producerService = _cluster.Client.GetGrain<IProducerService>(Guid.Empty);
-
-        await producerService.CallAsync(1);
-
-        var streamProvider = _cluster.Client.GetStreamProvider("Queue");
-        var stream = streamProvider.GetStream<ProducerEvent>(StreamId.Create(new StreamIdentity(Guid.Empty, "ProducerEvent")));
-
+        var streamProvider = _cluster.Client.GetStreamProvider("client");
+        var stream = streamProvider.GetStream<ProducerEvent>(Guid.Empty);
         await stream.SubscribeAsync(Observer);
 
-        await Task.Delay(500);
+        await producerService.CallAsync(1);
+        await Task.Delay(2500);
 
         var newValue = await consumerService.GetAsync();
         Assert.Equal(1, newValue);

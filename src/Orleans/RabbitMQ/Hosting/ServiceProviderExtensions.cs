@@ -66,23 +66,20 @@ public static class ServiceProviderExtensions
     /// <param name="name">The name.</param>
     /// <returns>The stream queue mapper.</returns>
     /// <exception cref="ArgumentException">The argument exception.</exception>
-    internal static IStreamQueueMapper CreateStreamQueueMapper(
+    internal static IStreamQueueMapper CreateDefaultStreamQueueMapper(
         this IServiceProvider serviceProvider,
         object? name)
     {
         ArgumentNullException.ThrowIfNull(serviceProvider);
         ArgumentNullException.ThrowIfNull(name);
+
         if (name is not string factoryName)
         {
             throw new ArgumentException("Invalid name");
         }
 
-        var streamQueueMapper = serviceProvider
-            .GetOptionalOrleansServiceByName<IStreamQueueMapper>(factoryName) ?? new HashRingBasedStreamQueueMapper(
-            new HashRingStreamQueueMapperOptions(),
-            factoryName);
-
-        return streamQueueMapper;
+        var options = serviceProvider.GetOptionsByName<HashRingStreamQueueMapperOptions>(factoryName);
+        return new HashRingBasedStreamQueueMapper(options, factoryName);
     }
 
     /// <summary>
@@ -92,7 +89,7 @@ public static class ServiceProviderExtensions
     /// <param name="name">The name.</param>
     /// <returns>The queue adapter cache.</returns>
     /// <exception cref="ArgumentException">The argument exception when name is not string.</exception>
-    internal static IQueueAdapterCache CreateQueueAdapterCache(
+    internal static IQueueAdapterCache CreateDefaultQueueAdapterCache(
         IServiceProvider serviceProvider,
         object? name)
     {
@@ -104,11 +101,8 @@ public static class ServiceProviderExtensions
         }
 
         var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
-        var adapterCache = serviceProvider
-            .GetOptionalOrleansServiceByName<IQueueAdapterCache>(factoryName) ??
-                           new SimpleQueueAdapterCache(new SimpleQueueCacheOptions(), factoryName, loggerFactory);
-
-        return adapterCache;
+        var options = serviceProvider.GetOptionsByName<SimpleQueueCacheOptions>(factoryName);
+        return new SimpleQueueAdapterCache(options, factoryName, loggerFactory);
     }
 
     /// <summary>

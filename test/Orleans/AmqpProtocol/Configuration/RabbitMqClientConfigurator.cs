@@ -29,8 +29,8 @@ public class RabbitMqClientConfigurator : IClientBuilderConfigurator
                     Port = 5672,
                 });
             })
-            .AddHashRingStreamQueueMapper(options => { })
-            .AddSimpleQueueCache(_ => { })
+            .AddHashRingStreamQueueMapper()
+            .AddSimpleQueueCache()
             .Build();
     }
 }

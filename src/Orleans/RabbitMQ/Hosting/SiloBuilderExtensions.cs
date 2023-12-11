@@ -64,10 +64,22 @@ public static class SiloBuilderExtensions
         ArgumentNullException.ThrowIfNull(configureOptions);
         siloBuilder
             .ConfigureServices(services => services
-                .AddOrleansNamedSingletonFactory(siloBuilder.Name, ServiceProviderExtensions.CreateStreamQueueMapper)
+                .AddOrleansNamedSingletonFactory(siloBuilder.Name, ServiceProviderExtensions.CreateDefaultStreamQueueMapper)
                 .AddOptions<HashRingStreamQueueMapperOptions>(siloBuilder.Name)
                 .Configure(configureOptions));
         return siloBuilder;
+    }
+
+    /// <summary>
+    /// Add Hash Ring Stream Queue Mapper.
+    /// </summary>
+    /// <param name="siloBuilder">The silo builder.</param>
+    /// <returns>The rabbitmq silo options builder.</returns>
+    public static IRabbitMqSiloOptionsBuilder AddHashRingStreamQueueMapper(
+        this IRabbitMqSiloOptionsBuilder siloBuilder)
+    {
+        ArgumentNullException.ThrowIfNull(siloBuilder);
+        return AddHashRingStreamQueueMapper(siloBuilder, _ => { });
     }
 
     /// <summary>
@@ -88,7 +100,7 @@ public static class SiloBuilderExtensions
     }
 
     /// <summary>
-    /// Add Hash Ring Stream Queue Mapper.
+    /// Add Simple Queue Cache.
     /// </summary>
     /// <param name="siloBuilder">The silo builder.</param>
     /// <param name="configureOptions">The configure options.</param>
@@ -101,9 +113,21 @@ public static class SiloBuilderExtensions
         ArgumentNullException.ThrowIfNull(configureOptions);
         siloBuilder
             .ConfigureServices(services => services
-                .AddOrleansNamedSingletonFactory(siloBuilder.Name, ServiceProviderExtensions.CreateQueueAdapterCache)
+                .AddOrleansNamedSingletonFactory(siloBuilder.Name, ServiceProviderExtensions.CreateDefaultQueueAdapterCache)
                 .AddOptions<SimpleQueueCacheOptions>(siloBuilder.Name)
                 .Configure(configureOptions));
         return siloBuilder;
+    }
+
+    /// <summary>
+    /// Add Simple Queue Cache.
+    /// </summary>
+    /// <param name="siloBuilder">The silo builder.</param>
+    /// <returns>The rabbitmq silo options builder.</returns>
+    public static IRabbitMqSiloOptionsBuilder AddSimpleQueueCache(
+        this IRabbitMqSiloOptionsBuilder siloBuilder)
+    {
+        ArgumentNullException.ThrowIfNull(siloBuilder);
+        return AddSimpleQueueCache(siloBuilder, _ => { });
     }
 }

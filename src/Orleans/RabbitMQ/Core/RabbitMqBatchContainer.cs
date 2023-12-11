@@ -10,6 +10,9 @@ using global::Orleans.Streams;
 /// <summary>
 /// Escendit.Orleans.Streaming.RabbitMQ.Tests Batch Container.
 /// </summary>
+[Serializable]
+[GenerateSerializer]
+[Alias("rabbitmq-batch-container")]
 internal class RabbitMqBatchContainer : IBatchContainer, IComparable<RabbitMqBatchContainer>
 {
     [Id(0)]
@@ -18,11 +21,15 @@ internal class RabbitMqBatchContainer : IBatchContainer, IComparable<RabbitMqBat
 
     [Id(1)]
     [JsonPropertyName("requestContext")]
-    private readonly Dictionary<string, object> _requestContext;
+    private readonly Dictionary<string, object>? _requestContext;
 
     [Id(2)]
     [JsonPropertyName("sequenceToken")]
-    private readonly RabbitMqStreamSequenceToken _sequenceToken;
+    private readonly RabbitMqStreamSequenceToken? _sequenceToken;
+
+    [Id(4)]
+    [JsonPropertyName("deliveryTag")]
+    private ulong? _deliveryTag;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RabbitMqBatchContainer"/> class.
@@ -31,26 +38,37 @@ internal class RabbitMqBatchContainer : IBatchContainer, IComparable<RabbitMqBat
     /// <param name="events">The events.</param>
     /// <param name="requestContext">The request context.</param>
     /// <param name="sequenceToken">The sequence token.</param>
+    /// <param name="deliveryTag">The delivery tag.</param>
     [JsonConstructor]
     public RabbitMqBatchContainer(
         StreamId streamId,
         ICollection<object> events,
         Dictionary<string, object> requestContext,
-        RabbitMqStreamSequenceToken sequenceToken)
+        RabbitMqStreamSequenceToken? sequenceToken,
+        ulong? deliveryTag = default)
     {
         StreamId = streamId;
         _events = events;
         _requestContext = requestContext;
         _sequenceToken = sequenceToken;
+        _deliveryTag = deliveryTag;
     }
 
     /// <inheritdoc />
-    public StreamSequenceToken SequenceToken => _sequenceToken;
+    [JsonIgnore]
+    public StreamSequenceToken? SequenceToken => _sequenceToken;
 
     /// <inheritdoc />
     [Id(3)]
     [JsonPropertyName("streamId")]
     public StreamId StreamId { get; }
+
+    /// <summary>
+    /// Gets the delivery tag.
+    /// </summary>
+    /// <value>The delivery tag.</value>
+    [JsonIgnore]
+    public ulong? DeliveryTag => _deliveryTag ?? 0;
 
     public static bool operator ==(RabbitMqBatchContainer? left, RabbitMqBatchContainer? right)
     {
@@ -83,9 +101,14 @@ internal class RabbitMqBatchContainer : IBatchContainer, IComparable<RabbitMqBat
     }
 
     /// <inheritdoc />
-    public IEnumerable<Tuple<T, StreamSequenceToken>> GetEvents<T>()
+    public IEnumerable<Tuple<T, StreamSequenceToken?>> GetEvents<T>()
     {
-        return _events.OfType<T>().Select((e, i) => Tuple.Create<T, StreamSequenceToken>(e, new RabbitMqStreamSequenceToken(_sequenceToken.SequenceNumber, i)));
+        var events = _events.OfType<T>();
+        var returns = events.Select((e, i) =>
+            Tuple.Create<T, StreamSequenceToken?>(
+                e,
+                _sequenceToken is null ? null : new RabbitMqStreamSequenceToken(_sequenceToken.SequenceNumber, i)));
+        return returns;
     }
 
     /// <inheritdoc />
@@ -123,16 +146,16 @@ internal class RabbitMqBatchContainer : IBatchContainer, IComparable<RabbitMqBat
     /// <returns>The hash code.</returns>
     public override int GetHashCode()
     {
-        return 397 * _events.GetHashCode() ^ (_requestContext?.GetHashCode() ?? 17) ^ _sequenceToken.GetHashCode();
+        return 397 * _events.GetHashCode() ^ (_requestContext?.GetHashCode() ?? 17) ^ _sequenceToken?.GetHashCode() ?? 19;
     }
 
     /// <summary>
-    /// Update Sequence Token.
+    /// Update Delivery Tag.
     /// </summary>
-    /// <param name="streamSequenceToken">The stream sequence token.</param>
-    internal void UpdateSequenceToken(RabbitMqStreamSequenceToken streamSequenceToken)
+    /// <param name="deliveryTag">The delivery tag.</param>
+    internal void UpdateDeliveryTag(ulong deliveryTag)
     {
-        _sequenceToken.Update(streamSequenceToken.SequenceNumber, streamSequenceToken.EventIndex);
+        _deliveryTag = deliveryTag;
     }
 
     private static int Compare(RabbitMqBatchContainer? left, RabbitMqBatchContainer? right)

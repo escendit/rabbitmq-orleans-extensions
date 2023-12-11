@@ -90,13 +90,12 @@ internal sealed partial class StreamProtocolAdapter : IQueueAdapter
                 _loggerFactory.CreateLogger<Producer>());
 
         var lastPublishingId = await producer.GetLastPublishingId();
-        var lastPublishingIdLong = Convert.ToInt64(lastPublishingId);
 
         var container = new RabbitMqBatchContainer(
             streamId,
             events.Cast<object>().ToList(),
             requestContext,
-            new RabbitMqStreamSequenceToken(lastPublishingIdLong));
+            new RabbitMqStreamSequenceToken(lastPublishingId));
 
         var data = _serializer
             .SerializeToArray(container);

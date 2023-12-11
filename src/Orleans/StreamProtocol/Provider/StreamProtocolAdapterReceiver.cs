@@ -45,7 +45,7 @@ internal sealed partial class StreamProtocolAdapterReceiver : IQueueAdapterRecei
         _name = name;
         _clusterOptions = clusterOptions;
         _queueId = queueId;
-        _logger = loggerFactory.CreateLogger($"Escendit.Orleans.Streaming.RabbitMQ.Stream.{_queueId}");
+        _logger = loggerFactory.CreateLogger($"Escendit.Orleans.Streaming.RabbitMQ.StreamProtocol.{_queueId}");
         _serializer = serializer;
         _streamSystem = streamSystem;
         _inboundChannel = Channel.CreateBounded<RabbitMqBatchContainer>(16);
@@ -59,11 +59,12 @@ internal sealed partial class StreamProtocolAdapterReceiver : IQueueAdapterRecei
         _consumer = await _streamSystem
             .CreateRawConsumer(new RawConsumerConfig(streamName)
             {
-                MessageHandler = async (_, _, message) =>
+                MessageHandler = async (_, context, message) =>
                 {
                     LogMessageHandlerIncomingMessage(_name, _queueId, message.Data.Size);
                     await _inboundChannel.Writer.WaitToWriteAsync(); // Wait for queue
                     var container = _serializer.Deserialize(message.Data.Contents);
+                    container.UpdateDeliveryTag(context.Offset);
                     await _inboundChannel.Writer.WriteAsync(container);
                 },
             });
@@ -94,17 +95,14 @@ internal sealed partial class StreamProtocolAdapterReceiver : IQueueAdapterRecei
     }
 
     /// <inheritdoc/>
-    public async Task MessagesDeliveredAsync(IList<IBatchContainer> messages)
+    public Task MessagesDeliveredAsync(IList<IBatchContainer> messages)
     {
         ArgumentNullException.ThrowIfNull(messages);
         LogMessagesDelivered(_name, _queueId, messages.Count);
 
-        var maxNumber = Convert.ToUInt64(messages.Max(p => p.SequenceToken.SequenceNumber));
+        var maxNumber = messages.Cast<RabbitMqBatchContainer>().Max(p => p.DeliveryTag);
 
-        if (maxNumber > 0)
-        {
-            await _consumer!.StoreOffset(maxNumber);
-        }
+        return maxNumber is > 0 ? _consumer!.StoreOffset(maxNumber.Value) : Task.CompletedTask;
     }
 
     /// <inheritdoc/>
