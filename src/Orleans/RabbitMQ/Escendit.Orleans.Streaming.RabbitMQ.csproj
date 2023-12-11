@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <PackageReference Include="Escendit.Extensions.DependencyInjection.RabbitMQ.Abstractions"/>
+        <PackageReference Include="Microsoft.Orleans.Runtime"/>
+        <PackageReference Include="Microsoft.Orleans.Streaming" />
+    </ItemGroup>
+    <ItemGroup>
+      <None Include="..\..\..\README.md">
+        <Link>README.md</Link>
+      </None>
+    </ItemGroup>
+</Project>

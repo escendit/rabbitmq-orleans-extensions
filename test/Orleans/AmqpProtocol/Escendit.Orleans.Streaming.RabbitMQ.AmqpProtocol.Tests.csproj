@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\src\Orleans\AmqpProtocol\Escendit.Orleans.Streaming.RabbitMQ.AmqpProtocol.csproj"/>
+        <ProjectReference Include="..\..\..\src\Orleans\RabbitMQ\Escendit.Orleans.Streaming.RabbitMQ.csproj"/>
+        <ProjectReference Include="..\RabbitMQ\Escendit.Orleans.Streaming.RabbitMQ.Tests.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+      <PackageReference Include="Microsoft.Orleans.TestingHost" />
+    </ItemGroup>
+</Project>
