@@ -15,15 +15,14 @@ using global::Orleans.Streams;
 using global::RabbitMQ.Client;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using ConnectionOptions = Extensions.DependencyInjection.RabbitMQ.Abstractions.ConnectionOptions;
+using RabbitMQ.Provider;
 
 /// <summary>
 /// AMQP Protocol Adapter Factory.
 /// </summary>
-internal partial class AmqpProtocolAdapterFactory : IQueueAdapterFactory
+internal sealed class AmqpProtocolAdapterFactory : AdapterFactoryBase
 {
     private readonly ILoggerFactory _loggerFactory;
-    private readonly ILogger _logger;
     private readonly string _name;
     private readonly IConnection _connection;
     private readonly IStreamQueueMapper _streamQueueMapper;
@@ -44,7 +43,6 @@ internal partial class AmqpProtocolAdapterFactory : IQueueAdapterFactory
     /// <param name="clusterOptions">The cluster options.</param>
     /// <param name="serializer">The serializer.</param>
     /// <param name="loggerFactory">The logger factory.</param>
-    /// <param name="streamFailureHandler">The stream failure handler.</param>
     public AmqpProtocolAdapterFactory(
         string name,
         IConnection connection,
@@ -54,6 +52,7 @@ internal partial class AmqpProtocolAdapterFactory : IQueueAdapterFactory
         ClusterOptions clusterOptions,
         Serializer serializer,
         ILoggerFactory loggerFactory)
+        : base(loggerFactory.CreateLogger<AmqpProtocolAdapterFactory>())
     {
         ArgumentNullException.ThrowIfNull(name);
         ArgumentNullException.ThrowIfNull(connection);
@@ -63,7 +62,6 @@ internal partial class AmqpProtocolAdapterFactory : IQueueAdapterFactory
         ArgumentNullException.ThrowIfNull(loggerFactory);
 
         _loggerFactory = loggerFactory;
-        _logger = _loggerFactory.CreateLogger<AmqpProtocolAdapterFactory>();
         _name = name;
         _connection = connection;
         _queueOptions = queueOptions;
@@ -75,7 +73,7 @@ internal partial class AmqpProtocolAdapterFactory : IQueueAdapterFactory
     }
 
     /// <inheritdoc/>
-    public Task<IQueueAdapter> CreateAdapter()
+    public override Task<IQueueAdapter> CreateAdapter()
     {
         LogCreateAdapter(_name);
 
@@ -91,21 +89,21 @@ internal partial class AmqpProtocolAdapterFactory : IQueueAdapterFactory
     }
 
     /// <inheritdoc/>
-    public IQueueAdapterCache GetQueueAdapterCache()
+    public override IQueueAdapterCache GetQueueAdapterCache()
     {
         LogGetQueueAdapterCache(_name);
         return _queueAdapterCache;
     }
 
     /// <inheritdoc/>
-    public IStreamQueueMapper GetStreamQueueMapper()
+    public override IStreamQueueMapper GetStreamQueueMapper()
     {
         LogGetStreamQueueMapper(_name);
         return _streamQueueMapper;
     }
 
     /// <inheritdoc/>
-    public Task<IStreamFailureHandler> GetDeliveryFailureHandler(QueueId queueId)
+    public override Task<IStreamFailureHandler> GetDeliveryFailureHandler(QueueId queueId)
     {
         LogGetDeliveryFailureHandler(_name, queueId);
         return _streamFailureHandlerFactory(queueId);
@@ -151,32 +149,4 @@ internal partial class AmqpProtocolAdapterFactory : IQueueAdapterFactory
                 queueOptions,
                 clusterOptions.Value);
     }
-
-    [LoggerMessage(
-        EventId = 100,
-        EventName = nameof(CreateAdapter),
-        Level = LogLevel.Debug,
-        Message = "Creating Queue Adapter for ProviderName: {name}")]
-    private partial void LogCreateAdapter(string name);
-
-    [LoggerMessage(
-        EventId = 101,
-        EventName = nameof(GetQueueAdapterCache),
-        Level = LogLevel.Debug,
-        Message = "Setting Queue Adapter Cache for ProviderName: {name}")]
-    private partial void LogGetQueueAdapterCache(string name);
-
-    [LoggerMessage(
-        EventId = 102,
-        EventName = nameof(GetStreamQueueMapper),
-        Level = LogLevel.Debug,
-        Message = "Getting Stream Queue Mapper for ProviderName: {name}")]
-    private partial void LogGetStreamQueueMapper(string name);
-
-    [LoggerMessage(
-        EventId = 500,
-        EventName = nameof(GetDeliveryFailureHandler),
-        Level = LogLevel.Debug,
-        Message = "Getting Delivery Failure Handler for ProviderName: {name}, QueueId: {queueId}")]
-    private partial void LogGetDeliveryFailureHandler(string name, QueueId queueId);
 }

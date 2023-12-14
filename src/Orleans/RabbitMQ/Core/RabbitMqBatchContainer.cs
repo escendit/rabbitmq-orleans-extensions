@@ -25,7 +25,7 @@ internal class RabbitMqBatchContainer : IBatchContainer, IComparable<RabbitMqBat
 
     [Id(2)]
     [JsonPropertyName("sequenceToken")]
-    private readonly RabbitMqStreamSequenceToken? _sequenceToken;
+    private RabbitMqStreamSequenceToken? _sequenceToken;
 
     [Id(4)]
     [JsonPropertyName("deliveryTag")]
@@ -156,6 +156,7 @@ internal class RabbitMqBatchContainer : IBatchContainer, IComparable<RabbitMqBat
     internal void UpdateDeliveryTag(ulong deliveryTag)
     {
         _deliveryTag = deliveryTag;
+        _sequenceToken = new RabbitMqStreamSequenceToken(deliveryTag);
     }
 
     private static int Compare(RabbitMqBatchContainer? left, RabbitMqBatchContainer? right)

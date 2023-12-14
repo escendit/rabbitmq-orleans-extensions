@@ -15,7 +15,7 @@ using Microsoft.Extensions.Logging;
 /// <summary>
 /// Escendit.Orleans.Streaming.RabbitMQ.Tests AMQP Protocol Adapter.
 /// </summary>
-internal partial class AmqpProtocolAdapter : IQueueAdapter
+internal sealed partial class AmqpProtocolAdapter : IQueueAdapter
 {
     private readonly ILogger _logger;
     private readonly ILoggerFactory _loggerFactory;

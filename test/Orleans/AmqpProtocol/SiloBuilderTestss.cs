@@ -58,7 +58,7 @@ public class SiloBuilderTestss
         await producerService.CallAsync(1);
 
         var value = await producerService.GetAsync();
-        Assert.True(value == 1);
+        Assert.Equal(1, value);
     }
 
     /// <summary>
