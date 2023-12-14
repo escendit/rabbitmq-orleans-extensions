@@ -102,7 +102,7 @@ internal sealed class StreamProtocolAdapterReceiver : AdapterReceiverBase
 
         var maxNumber = messages.Cast<RabbitMqBatchContainer>().Max(p => p.DeliveryTag);
 
-        return maxNumber is > 0 ? _consumer!.StoreOffset(maxNumber.Value) : Task.CompletedTask;
+        return maxNumber > 0 ? _consumer!.StoreOffset(maxNumber) : Task.CompletedTask;
     }
 
     /// <inheritdoc/>

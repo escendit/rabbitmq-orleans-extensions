@@ -68,7 +68,7 @@ internal class RabbitMqBatchContainer : IBatchContainer, IComparable<RabbitMqBat
     /// </summary>
     /// <value>The delivery tag.</value>
     [JsonIgnore]
-    public ulong? DeliveryTag => _deliveryTag ?? 0;
+    public ulong DeliveryTag => _deliveryTag ?? 0;
 
     public static bool operator ==(RabbitMqBatchContainer? left, RabbitMqBatchContainer? right)
     {
@@ -104,10 +104,10 @@ internal class RabbitMqBatchContainer : IBatchContainer, IComparable<RabbitMqBat
     public IEnumerable<Tuple<T, StreamSequenceToken?>> GetEvents<T>()
     {
         var events = _events.OfType<T>();
-        var returns = events.Select((e, i) =>
+        var returns = events.Select((@event, i) =>
             Tuple.Create<T, StreamSequenceToken?>(
-                e,
-                _sequenceToken is null ? null : new RabbitMqStreamSequenceToken(_sequenceToken.SequenceNumber, i)));
+                @event,
+                new RabbitMqStreamSequenceToken(Convert.ToInt64(_deliveryTag ?? 0), i)));
         return returns;
     }
 
@@ -146,7 +146,7 @@ internal class RabbitMqBatchContainer : IBatchContainer, IComparable<RabbitMqBat
     /// <returns>The hash code.</returns>
     public override int GetHashCode()
     {
-        return 397 * _events.GetHashCode() ^ (_requestContext?.GetHashCode() ?? 17) ^ _sequenceToken?.GetHashCode() ?? 19;
+        return 397 * _events.GetHashCode() ^ (_requestContext?.GetHashCode() ?? 17) ^ DeliveryTag.GetHashCode();
     }
 
     /// <summary>

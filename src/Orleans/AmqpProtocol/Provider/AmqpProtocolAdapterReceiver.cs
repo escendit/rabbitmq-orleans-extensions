@@ -102,10 +102,7 @@ internal sealed class AmqpProtocolAdapterReceiver : AdapterReceiverBase
 
         foreach (var deliveryTag in messages.Cast<RabbitMqBatchContainer>().Select(s => s.DeliveryTag))
         {
-            if (deliveryTag.HasValue)
-            {
-                _channel.BasicAck(deliveryTag.Value, false);
-            }
+            _channel.BasicAck(deliveryTag, false);
         }
 
         return Task.CompletedTask;
