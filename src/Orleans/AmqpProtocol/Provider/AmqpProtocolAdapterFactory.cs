@@ -9,7 +9,6 @@ using Configuration;
 using Core;
 using global::Orleans.Configuration;
 using global::Orleans.Configuration.Overrides;
-using global::Orleans.Providers.Streams.Common;
 using global::Orleans.Serialization;
 using global::Orleans.Streams;
 using global::RabbitMQ.Client;
@@ -127,17 +126,9 @@ internal sealed class AmqpProtocolAdapterFactory : AdapterFactoryBase
 
         var clusterOptions = serviceProvider.GetProviderClusterOptions(factoryName);
         var queueOptions = serviceProvider.GetOptionsByName<QueueOptions>(factoryName);
-        var queueMapperOptions = serviceProvider.GetOptionsByName<HashRingStreamQueueMapperOptions>(factoryName);
         var connection = serviceProvider.GetRequiredOrleansServiceByName<IConnection>(factoryName);
-        var streamQueueMapper = serviceProvider.GetOptionalOrleansServiceByName<IStreamQueueMapper>(factoryName);
-        var adapterCache = serviceProvider.GetOptionalOrleansServiceByName<IQueueAdapterCache>(factoryName);
-
-        streamQueueMapper ??= new HashRingBasedStreamQueueMapper(queueMapperOptions, factoryName);
-
-        adapterCache ??= new SimpleQueueAdapterCache(
-            new SimpleQueueCacheOptions(),
-            factoryName,
-            serviceProvider.GetRequiredService<ILoggerFactory>());
+        var streamQueueMapper = serviceProvider.GetRequiredOrleansServiceByName<IStreamQueueMapper>(factoryName);
+        var adapterCache = serviceProvider.GetRequiredOrleansServiceByName<IQueueAdapterCache>(factoryName);
 
         return ActivatorUtilities
             .CreateInstance<AmqpProtocolAdapterFactory>(

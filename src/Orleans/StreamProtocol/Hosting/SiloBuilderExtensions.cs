@@ -23,12 +23,15 @@ public static class SiloBuilderExtensions
     {
         ArgumentNullException.ThrowIfNull(siloBuilder);
         ArgumentNullException.ThrowIfNull(configureOptions);
+        var configurator = new SiloConfigurator(
+            siloBuilder.Name,
+            configureDelegate => siloBuilder
+                .ConfigureServices(configureDelegate));
+        configurator
+            .Configure<ConnectionOptions>(options => options.Configure(configureOptions));
         return new RabbitMqSiloOptionsBuilder(
             siloBuilder.Name,
             siloBuilder.Services,
-            new SiloConfigurator(
-            siloBuilder.Name,
-            configureDelegate => siloBuilder
-                .ConfigureServices(configureDelegate)));
+            configurator);
     }
 }

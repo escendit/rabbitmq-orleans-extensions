@@ -1,17 +1,12 @@
 ﻿// Copyright (c) Escendit Ltd. All Rights Reserved.
 // Licensed under the MIT. See LICENSE.txt file in the solution root for full license information.
 
-namespace Escendit.Orleans.Streaming.RabbitMQ.AmqpProtocol.Tests;
+namespace Escendit.Orleans.Streaming.RabbitMQ.StreamProtocol.Tests;
 
 using Collections;
-using Escendit.Extensions.DependencyInjection.RabbitMQ.Abstractions;
-using Escendit.Orleans.Streaming.RabbitMQ.Hosting;
 using Fixtures;
-using global::Orleans.Streams;
 using global::Orleans.TestingHost;
-using global::RabbitMQ.Client;
-using Microsoft.Extensions.Hosting;
-using RabbitMQ.Tests.Grains;
+using Xunit.Categories;
 
 /// <summary>
 /// Client Builder Tests.
@@ -39,16 +34,5 @@ public class ClientBuilderTests
     public void ClusterIsUp()
     {
         Assert.NotNull(_cluster);
-    }
-
-    /// <summary>
-    /// Start.
-    /// </summary>
-    [Fact]
-    [IntegrationTest]
-    public void StartConnection()
-    {
-        var connection = _cluster.ServiceProvider.GetOptionalOrleansServiceByName<IConnection>("client");
-        Assert.True(connection?.IsOpen);
     }
 }

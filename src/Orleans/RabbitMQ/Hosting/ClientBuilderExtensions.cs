@@ -5,11 +5,8 @@ namespace Escendit.Orleans.Streaming.RabbitMQ.Hosting;
 
 using Builder;
 using global::Orleans.Configuration;
-using global::Orleans.Providers.Streams.Common;
 using global::Orleans.Streams;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using OrleansCodeGen.Orleans.Concurrency;
 
 /// <summary>
 /// Service Collection Extensions.
@@ -28,9 +25,6 @@ public static class ClientBuilderExtensions
     {
         ArgumentNullException.ThrowIfNull(clientBuilder);
         ArgumentNullException.ThrowIfNull(name);
-        clientBuilder
-            .ConfigureServices(services => services
-                .AddOrleansNamedSingletonFactory<Func<QueueId, Task<IStreamFailureHandler>>>(name, (_, _) => ServiceProviderExtensions.HandleFailure));
         return new RabbitMqClientProtocolBuilder(name, clientBuilder.Services);
     }
 

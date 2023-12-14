@@ -4,6 +4,7 @@
 namespace Escendit.Orleans.Streaming.RabbitMQ.StreamProtocol.Configuration;
 
 using Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Provider;
 
 /// <summary>
@@ -27,8 +28,10 @@ internal class ClusterClientConfigurator : ClusterClientPersistentStreamConfigur
             .ConfigureServices(configure =>
             {
                 configure
-                    .AddOrleansNamedSingletonFactory(name, StreamProtocolAdapterFactory.Create)
                     .AddClientStreaming();
+                configure
+                    .AddOrleansNamedSingletonFactory(name, StreamProtocolAdapterFactory.Create)
+                    .AddOptions<StreamOptions>(name);
             });
     }
 }

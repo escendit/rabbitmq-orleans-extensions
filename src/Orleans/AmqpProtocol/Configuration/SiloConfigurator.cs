@@ -28,8 +28,10 @@ internal class SiloConfigurator : SiloPersistentStreamConfigurator
         ConfigureDelegate(services =>
         {
             services
-                .AddOrleansNamedSingletonFactory(name, AmqpProtocolAdapterFactory.Create)
                 .AddSiloStreaming();
+            services
+                .AddOrleansNamedSingletonFactory(name, AmqpProtocolAdapterFactory.Create)
+                .AddOptions<QueueOptions>(name);
         });
     }
 }

@@ -74,8 +74,7 @@ public sealed class StreamProtocolAdapterFactory : AdapterFactoryBase
     public override async Task<IQueueAdapter> CreateAdapter()
     {
         LogCreateAdapter(_name);
-        var streamSystem = await CreateStreamSystem(_connectionOptions, _loggerFactory.CreateLogger<StreamSystem>())
-            .ConfigureAwait(false);
+        var streamSystem = await CreateStreamSystem(_connectionOptions, _loggerFactory.CreateLogger<StreamSystem>());
         return new StreamProtocolAdapter(_name, _loggerFactory, _clusterOptions, _serializer, _streamQueueMapper, streamSystem);
     }
 
@@ -117,7 +116,18 @@ public sealed class StreamProtocolAdapterFactory : AdapterFactoryBase
         }
 
         var clusterOptions = serviceProvider.GetProviderClusterOptions(factoryName);
-        return ActivatorUtilities.CreateInstance<StreamProtocolAdapterFactory>(serviceProvider, name, clusterOptions.Value);
+        var streamQueueMapper = serviceProvider.GetRequiredOrleansServiceByName<IStreamQueueMapper>(factoryName);
+        var queueAdapterCache = serviceProvider.GetRequiredOrleansServiceByName<IQueueAdapterCache>(factoryName);
+        var connectionOptions = serviceProvider.GetOptionsByName<ConnectionOptions>(factoryName);
+        var streamOptions = serviceProvider.GetOptionsByName<StreamOptions>(factoryName);
+        return ActivatorUtilities.CreateInstance<StreamProtocolAdapterFactory>(
+            serviceProvider,
+            name,
+            streamQueueMapper,
+            queueAdapterCache,
+            connectionOptions,
+            streamOptions,
+            clusterOptions.Value);
     }
 
     private static Task<StreamSystem> CreateStreamSystem(ConnectionOptions connectionOptions, ILogger<StreamSystem> logger)
