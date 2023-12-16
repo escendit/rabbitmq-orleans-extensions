@@ -5,29 +5,36 @@ namespace Escendit.Orleans.Streaming.RabbitMQ.AmqpProtocol.Tests;
 
 using Collections;
 using Fixtures;
-using global::Orleans.Runtime;
 using global::Orleans.Streams;
 using global::Orleans.TestingHost;
 using RabbitMQ.Tests.Grains;
-using Xunit.Categories;
-using StreamIdentity = global::Orleans.Streams.StreamIdentity;
 
 /// <summary>
-/// Silo Builder Tests.
+/// Orleans Tests.
 /// </summary>
 [Collection(ClusterCollectionFixture.Name)]
-public class SiloBuilderTestss
+public class OrleansTests
 {
     private readonly TestCluster _cluster;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="SiloBuilderTestss"/> class.
+    /// Initializes a new instance of the <see cref="OrleansTests"/> class.
     /// </summary>
     /// <param name="fixture">The cluster fixture.</param>
-    public SiloBuilderTestss(ClusterFixture fixture)
+    public OrleansTests(ClusterFixture fixture)
     {
         ArgumentNullException.ThrowIfNull(fixture);
         _cluster = fixture.Cluster;
+    }
+
+    /// <summary>
+    /// Start.
+    /// </summary>
+    [Fact]
+    [IntegrationTest]
+    public void ClusterIsUp()
+    {
+        Assert.NotNull(_cluster);
     }
 
     /// <summary>
