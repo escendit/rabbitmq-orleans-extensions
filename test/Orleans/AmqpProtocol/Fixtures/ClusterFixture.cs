@@ -3,7 +3,6 @@
 
 namespace Escendit.Orleans.Streaming.RabbitMQ.AmqpProtocol.Tests.Fixtures;
 
-using System.Diagnostics.CodeAnalysis;
 using Configuration;
 using global::Orleans.TestingHost;
 using global::RabbitMQ.Configuration;
@@ -11,8 +10,6 @@ using global::RabbitMQ.Configuration;
 /// <summary>
 /// Cluster Fixture.
 /// </summary>
-[DynamicallyAccessedMembers(
-    DynamicallyAccessedMemberTypes.PublicConstructors)]
 public sealed class ClusterFixture : IDisposable
 {
     /// <summary>

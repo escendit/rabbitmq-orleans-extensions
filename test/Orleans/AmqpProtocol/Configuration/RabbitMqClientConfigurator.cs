@@ -4,8 +4,8 @@
 namespace Escendit.Orleans.Streaming.RabbitMQ.AmqpProtocol.Tests.Configuration;
 
 using Escendit.Extensions.DependencyInjection.RabbitMQ.Abstractions;
-using Escendit.Orleans.Streaming.RabbitMQ.Hosting;
 using global::Orleans.TestingHost;
+using Hosting;
 using Microsoft.Extensions.Configuration;
 
 /// <summary>
@@ -29,8 +29,6 @@ public class RabbitMqClientConfigurator : IClientBuilderConfigurator
                     Port = 5672,
                 });
             })
-            .AddHashRingStreamQueueMapper()
-            .AddSimpleQueueCache()
             .Build();
     }
 }

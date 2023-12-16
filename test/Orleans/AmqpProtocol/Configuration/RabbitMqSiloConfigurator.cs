@@ -4,8 +4,8 @@
 namespace Escendit.Orleans.Streaming.RabbitMQ.AmqpProtocol.Tests.Configuration;
 
 using Escendit.Extensions.DependencyInjection.RabbitMQ.Abstractions;
-using Escendit.Orleans.Streaming.RabbitMQ.Hosting;
 using global::Orleans.TestingHost;
+using Hosting;
 
 /// <summary>
 /// Rabbit MQ Silo Configurator.
@@ -31,8 +31,6 @@ public class RabbitMqSiloConfigurator : ISiloConfigurator
                     Port = 5672,
                 });
             })
-            .AddHashRingStreamQueueMapper()
-            .AddSimpleQueueCache()
             .Build();
     }
 }

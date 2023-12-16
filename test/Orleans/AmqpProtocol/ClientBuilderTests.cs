@@ -4,51 +4,83 @@
 namespace Escendit.Orleans.Streaming.RabbitMQ.AmqpProtocol.Tests;
 
 using Collections;
-using Escendit.Extensions.DependencyInjection.RabbitMQ.Abstractions;
-using Escendit.Orleans.Streaming.RabbitMQ.Hosting;
 using Fixtures;
 using global::Orleans.Streams;
-using global::Orleans.TestingHost;
-using global::RabbitMQ.Client;
-using Microsoft.Extensions.Hosting;
-using RabbitMQ.Tests.Grains;
+using global::RabbitMQ.Tests.Extensions;
+using global::RabbitMQ.Tests.Generators;
+using Hosting;
 
 /// <summary>
 /// Client Builder Tests.
 /// </summary>
-[Collection(ClusterCollectionFixture.Name)]
+[Collection(HostCollectionFixture.Name)]
 public class ClientBuilderTests
 {
-    private readonly TestCluster _cluster;
+    private readonly HostBuilderFixture _fixture;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ClientBuilderTests"/> class.
     /// </summary>
     /// <param name="fixture">The cluster fixture.</param>
-    public ClientBuilderTests(ClusterFixture fixture)
+    public ClientBuilderTests(HostBuilderFixture fixture)
     {
         ArgumentNullException.ThrowIfNull(fixture);
-        _cluster = fixture.Cluster;
+        _fixture = fixture;
     }
 
     /// <summary>
-    /// Start.
+    /// Add Rabbit MQ.
     /// </summary>
     [Fact]
-    [IntegrationTest]
-    public void ClusterIsUp()
+    [UnitTest]
+    public void AddRabbitMq()
     {
-        Assert.NotNull(_cluster);
+        var host = _fixture
+            .CreateClusterClientHostBuilder(clientBuilder =>
+            {
+                clientBuilder
+                    .AddRabbitMq("test");
+            })
+            .Build();
+        Assert.NotNull(host);
     }
 
     /// <summary>
-    /// Start.
+    /// Add RabbitMQ Use Stream Protocol.
     /// </summary>
     [Fact]
-    [IntegrationTest]
-    public void StartConnection()
+    [UnitTest]
+    public void AddRabbitMqUseStreamProtocol()
     {
-        var connection = _cluster.ServiceProvider.GetOptionalOrleansServiceByName<IConnection>("client");
-        Assert.True(connection?.IsOpen);
+        var host = _fixture
+            .CreateClusterClientHostBuilder(clientBuilder =>
+            {
+                clientBuilder
+                    .AddRabbitMq("test")
+                    .UseAmqpProtocol(ConnectionExtensions.Setup)
+                    .Build();
+            });
+        Assert.NotNull(host);
+    }
+
+    /// <summary>
+    /// Add RabbitMQ UseStreamProtocol UsePubSubType.
+    /// </summary>
+    /// <param name="type"> The type.</param>
+    [Theory]
+    [ClassData(typeof(StreamPubSubTypeGenerator))]
+    public void AddRabbitMqUseStreamProtocolUsePubSubType(StreamPubSubType type)
+    {
+        var host = _fixture
+            .CreateClusterClientHostBuilder(clientBuilder =>
+            {
+                clientBuilder
+                    .AddRabbitMq("test")
+                    .UseAmqpProtocol(ConnectionExtensions.Setup)
+                    .ConfigureStreamPubSub(type)
+                    .Build();
+            })
+            .Build();
+        Assert.NotNull(host);
     }
 }
