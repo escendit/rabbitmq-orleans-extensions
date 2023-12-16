@@ -5,7 +5,6 @@ namespace Escendit.Orleans.Streaming.RabbitMQ.Hosting;
 
 using Builder;
 using global::Orleans.Configuration;
-using global::Orleans.Streams;
 using Microsoft.Extensions.DependencyInjection;
 
 /// <summary>
@@ -29,29 +28,12 @@ public static class ClientBuilderExtensions
     }
 
     /// <summary>
-    /// Add Stream Queue Mapper.
-    /// </summary>
-    /// <param name="clientBuilder">The client builder.</param>
-    /// <typeparam name="TImplementation">The implementation.</typeparam>
-    /// <returns>The rabbitmq client options builder.</returns>
-    public static IRabbitMqClientOptionsBuilder AddStreamQueueMapper<TImplementation>(
-        this IRabbitMqClientOptionsBuilder clientBuilder)
-        where TImplementation : class, IStreamQueueMapper
-    {
-        ArgumentNullException.ThrowIfNull(clientBuilder);
-        clientBuilder
-            .ConfigureServices(services => services
-                .AddOrleansNamedSingleton<IStreamQueueMapper, TImplementation>(clientBuilder.Name));
-        return clientBuilder;
-    }
-
-    /// <summary>
     /// Add Hash Ring Stream Queue Mapper.
     /// </summary>
     /// <param name="clientBuilder">The client builder.</param>
     /// <param name="configureOptions">The configure options.</param>
     /// <returns>The rabbitmq client options builder.</returns>
-    public static IRabbitMqClientOptionsBuilder AddHashRingStreamQueueMapper(
+    internal static IRabbitMqClientOptionsBuilder AddHashRingStreamQueueMapper(
         this IRabbitMqClientOptionsBuilder clientBuilder,
         Action<HashRingStreamQueueMapperOptions> configureOptions)
     {
@@ -70,28 +52,11 @@ public static class ClientBuilderExtensions
     /// </summary>
     /// <param name="clientBuilder">The client builder.</param>
     /// <returns>The rabbitmq client options builder.</returns>
-    public static IRabbitMqClientOptionsBuilder AddHashRingStreamQueueMapper(
+    internal static IRabbitMqClientOptionsBuilder AddHashRingStreamQueueMapper(
         this IRabbitMqClientOptionsBuilder clientBuilder)
     {
         ArgumentNullException.ThrowIfNull(clientBuilder);
         return AddHashRingStreamQueueMapper(clientBuilder, _ => { });
-    }
-
-    /// <summary>
-    /// Add Queue Adapter Cache.
-    /// </summary>
-    /// <param name="clientBuilder">The client builder.</param>
-    /// <typeparam name="TImplementation">The implementation type.</typeparam>
-    /// <returns>The rabbitmq client options builder.</returns>
-    public static IRabbitMqClientOptionsBuilder AddQueueAdapterCache<TImplementation>(
-        this IRabbitMqClientOptionsBuilder clientBuilder)
-        where TImplementation : class, IQueueAdapterCache
-    {
-        ArgumentNullException.ThrowIfNull(clientBuilder);
-        clientBuilder
-            .ConfigureServices(services => services
-                .AddOrleansNamedSingleton<IQueueAdapterCache, TImplementation>(clientBuilder.Name));
-        return clientBuilder;
     }
 
     /// <summary>
@@ -100,7 +65,7 @@ public static class ClientBuilderExtensions
     /// <param name="clientBuilder">The client builder.</param>
     /// <param name="configureOptions">The configure options.</param>
     /// <returns>The rabbitmq client options builder.</returns>
-    public static IRabbitMqClientOptionsBuilder AddSimpleQueueCache(
+    internal static IRabbitMqClientOptionsBuilder AddSimpleQueueCache(
         this IRabbitMqClientOptionsBuilder clientBuilder,
         Action<SimpleQueueCacheOptions> configureOptions)
     {
@@ -119,7 +84,7 @@ public static class ClientBuilderExtensions
     /// </summary>
     /// <param name="clientBuilder">The client builder.</param>
     /// <returns>The rabbitmq client options builder.</returns>
-    public static IRabbitMqClientOptionsBuilder AddSimpleQueueCache(
+    internal static IRabbitMqClientOptionsBuilder AddSimpleQueueCache(
         this IRabbitMqClientOptionsBuilder clientBuilder)
     {
         ArgumentNullException.ThrowIfNull(clientBuilder);

@@ -5,8 +5,10 @@ namespace Orleans.Hosting;
 
 using Escendit.Extensions.DependencyInjection.RabbitMQ.Abstractions;
 using Escendit.Orleans.Streaming.RabbitMQ.Builder;
+using Escendit.Orleans.Streaming.RabbitMQ.Hosting;
 using Escendit.Orleans.Streaming.RabbitMQ.StreamProtocol.Builder;
 using Escendit.Orleans.Streaming.RabbitMQ.StreamProtocol.Configuration;
+using Streams;
 
 /// <summary>
 /// Silo Builder Extensions.
@@ -32,6 +34,21 @@ public static class SiloBuilderExtensions
         return new RabbitMqSiloOptionsBuilder(
             siloBuilder.Name,
             siloBuilder.Services,
-            configurator);
+            configurator)
+            .AddSimpleQueueCache()
+            .AddHashRingStreamQueueMapper();
+    }
+
+    /// <summary>
+    /// Configure Stream Pub Sub.
+    /// </summary>
+    /// <param name="siloBuilder">The initial silo options builder.</param>
+    /// <param name="streamPubSubType">The stream pub sub type.</param>
+    /// <returns>The rabbitmq client options builder.</returns>
+    public static IRabbitMqSiloOptionsBuilder ConfigureStreamPubSub(this IRabbitMqSiloOptionsBuilder siloBuilder, StreamPubSubType streamPubSubType = StreamPubSubType.ExplicitGrainBasedAndImplicit)
+    {
+        ArgumentNullException.ThrowIfNull(siloBuilder);
+        siloBuilder.Configurator.ConfigureStreamPubSub(streamPubSubType);
+        return siloBuilder;
     }
 }

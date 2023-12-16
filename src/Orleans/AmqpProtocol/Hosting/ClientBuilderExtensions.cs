@@ -6,6 +6,7 @@ namespace Orleans.Hosting;
 using Escendit.Orleans.Streaming.RabbitMQ.AmqpProtocol.Builder;
 using Escendit.Orleans.Streaming.RabbitMQ.AmqpProtocol.Configuration;
 using Escendit.Orleans.Streaming.RabbitMQ.Builder;
+using Escendit.Orleans.Streaming.RabbitMQ.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Streams;
 using ConnectionOptions = Escendit.Extensions.DependencyInjection.RabbitMQ.Abstractions.ConnectionOptions;
@@ -29,7 +30,9 @@ public static class ClientBuilderExtensions
         configurator.Configure<ConnectionOptions>(options => options.Configure(configureOptions));
         clientBuilder.ConfigureServices(services => services
             .AddRabbitMqConnection(clientBuilder.Name, configureOptions));
-        return new RabbitMqClientOptionsBuilder(clientBuilder.Name, clientBuilder.Services, configurator);
+        return new RabbitMqClientOptionsBuilder(clientBuilder.Name, clientBuilder.Services, configurator)
+            .AddSimpleQueueCache()
+            .AddHashRingStreamQueueMapper();
     }
 
     /// <summary>

@@ -4,6 +4,7 @@
 namespace Orleans.Hosting;
 
 using Escendit.Orleans.Streaming.RabbitMQ.Builder;
+using Escendit.Orleans.Streaming.RabbitMQ.Hosting;
 using Escendit.Orleans.Streaming.RabbitMQ.StreamProtocol.Builder;
 using Escendit.Orleans.Streaming.RabbitMQ.StreamProtocol.Configuration;
 using Streams;
@@ -27,7 +28,9 @@ public static class ClientBuilderExtensions
         var configurator = new ClusterClientConfigurator(clientBuilder.Name, clientBuilder);
         configurator
             .Configure<ConnectionOptions>(options => options.Configure(configureOptions));
-        return new RabbitMqClientOptionsBuilder(clientBuilder.Name, clientBuilder.Services, configurator);
+        return new RabbitMqClientOptionsBuilder(clientBuilder.Name, clientBuilder.Services, configurator)
+            .AddSimpleQueueCache()
+            .AddHashRingStreamQueueMapper();
     }
 
     /// <summary>

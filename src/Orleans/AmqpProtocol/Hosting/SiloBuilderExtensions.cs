@@ -7,7 +7,9 @@ using Escendit.Extensions.DependencyInjection.RabbitMQ.Abstractions;
 using Escendit.Orleans.Streaming.RabbitMQ.AmqpProtocol.Builder;
 using Escendit.Orleans.Streaming.RabbitMQ.AmqpProtocol.Configuration;
 using Escendit.Orleans.Streaming.RabbitMQ.Builder;
+using Escendit.Orleans.Streaming.RabbitMQ.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Streams;
 
 /// <summary>
 /// Silo Builder Extensions.
@@ -32,6 +34,21 @@ public static class SiloBuilderExtensions
             configureDelegate => siloBuilder
                 .ConfigureServices(configureDelegate)
                 .ConfigureServices(services => services
-                    .AddRabbitMqConnection(siloBuilder.Name, configureOptions))));
+                    .AddRabbitMqConnection(siloBuilder.Name, configureOptions))))
+            .AddHashRingStreamQueueMapper()
+            .AddSimpleQueueCache();
+    }
+
+    /// <summary>
+    /// Configure Stream Pub Sub.
+    /// </summary>
+    /// <param name="siloBuilder">The initial silo options builder.</param>
+    /// <param name="streamPubSubType">The stream pub sub type.</param>
+    /// <returns>The rabbitmq client options builder.</returns>
+    public static IRabbitMqSiloOptionsBuilder ConfigureStreamPubSub(this IRabbitMqSiloOptionsBuilder siloBuilder, StreamPubSubType streamPubSubType = StreamPubSubType.ExplicitGrainBasedAndImplicit)
+    {
+        ArgumentNullException.ThrowIfNull(siloBuilder);
+        siloBuilder.Configurator.ConfigureStreamPubSub(streamPubSubType);
+        return siloBuilder;
     }
 }
