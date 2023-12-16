@@ -80,9 +80,12 @@ internal sealed partial class StreamProtocolAdapter : IQueueAdapter
         var queueId = _streamQueueMapper.GetQueueForStream(streamId);
         var streamName = NamingUtility.CreateNameForStream(_clusterOptions, queueId);
 
-        await _streamSystem
-            .CreateStream(
-                new StreamSpec(streamName));
+        if (!await _streamSystem.StreamExists(streamName))
+        {
+            await _streamSystem
+                .CreateStream(
+                    new StreamSpec(streamName));
+        }
 
         var producer = await _streamSystem
             .CreateRawProducer(

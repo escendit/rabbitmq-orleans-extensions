@@ -56,6 +56,12 @@ internal sealed class StreamProtocolAdapterReceiver : AdapterReceiverBase
     {
         LogInitialize(_name, _queueId);
         var streamName = NamingUtility.CreateNameForStream(_clusterOptions, _queueId);
+
+        if (!await _streamSystem.StreamExists(streamName))
+        {
+            await _streamSystem.CreateStream(new StreamSpec(streamName));
+        }
+
         _consumer = await _streamSystem
             .CreateRawConsumer(new RawConsumerConfig(streamName)
             {
