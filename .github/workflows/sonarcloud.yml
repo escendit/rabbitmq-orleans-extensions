@@ -24,7 +24,7 @@ jobs:
           java-version: 17
           distribution: 'zulu'
       - name: Setup .NET Core SDK 7, 8
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: |
             7.0.x
