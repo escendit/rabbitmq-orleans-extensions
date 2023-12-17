@@ -10,6 +10,12 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: '0'
+      - name: Start RabbitMQ
+        uses: namoshek/rabbitmq-github-action@v1
+        with:
+          version: '3.12'
+          ports: '5672:5672 5552:5552'
+          plugins: rabbitmq_stream
       - name: Setup .NET Core SDK 7, 8
         uses: actions/setup-dotnet@v3
         with:
@@ -21,7 +27,7 @@ jobs:
       - name: Build .NET Solution
         run: dotnet build --configuration Release --no-restore
       - name: Test .NET Solution
-        run: dotnet test --configuration Release --no-build --filter=Category=UnitTest --logger "trx;LogFilePrefix=test-results"
+        run: dotnet test --configuration Release --no-build --filter="Category=UnitTest|Category=IntegrationTest" --logger "trx;LogFilePrefix=test-results"
       - uses: actions/upload-artifact@v2
         if: success() || failure()
         with:

@@ -1,0 +1,8 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+      <ProjectReference Include="..\RabbitMQ\Escendit.Orleans.Streaming.RabbitMQ.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+      <PackageReference Include="RabbitMQ.Stream.Client" />
+    </ItemGroup>
+</Project>

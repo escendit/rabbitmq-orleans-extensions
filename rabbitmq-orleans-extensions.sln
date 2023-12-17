@@ -1,0 +1,76 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{EFD3DA34-B04F-4C90-B3E0-BEB2402B2D6A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{A5880995-120F-422E-9B46-4302F74C87FE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Orleans", "Orleans", "{3947EC73-A7D9-482C-86B1-8E4F6387B5FC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AspNetCore", "AspNetCore", "{275062C9-CF0B-4445-8940-1D6106966163}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Escendit.Orleans.Streaming.RabbitMQ", "src\Orleans\RabbitMQ\Escendit.Orleans.Streaming.RabbitMQ.csproj", "{EFA84B10-485C-4410-A201-E5F717404678}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Escendit.Orleans.Streaming.RabbitMQ.AmqpProtocol", "src\Orleans\AmqpProtocol\Escendit.Orleans.Streaming.RabbitMQ.AmqpProtocol.csproj", "{AF8058B1-5AD2-4E0F-B483-12FE69C7ABBD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Escendit.Orleans.Streaming.RabbitMQ.StreamProtocol", "src\Orleans\StreamProtocol\Escendit.Orleans.Streaming.RabbitMQ.StreamProtocol.csproj", "{F7431962-0830-47B5-8E51-8EED823E8794}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Orleans", "Orleans", "{5C89E98A-C88E-4478-9AD5-7FFE87AFD903}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Escendit.Orleans.Streaming.RabbitMQ.AmqpProtocol.Tests", "test\Orleans\AmqpProtocol\Escendit.Orleans.Streaming.RabbitMQ.AmqpProtocol.Tests.csproj", "{A0D36FA0-B374-4702-B51D-D7BBB8A764A8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Escendit.Orleans.Streaming.RabbitMQ.Tests", "test\Orleans\RabbitMQ\Escendit.Orleans.Streaming.RabbitMQ.Tests.csproj", "{D3385699-829C-4D03-A5CA-788D1470FD2A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Escendit.Orleans.Streaming.RabbitMQ.StreamProtocol.Tests", "test\Orleans\StreamProtocol\Escendit.Orleans.Streaming.RabbitMQ.StreamProtocol.Tests.csproj", "{2437B71B-0685-4428-93F2-8A1C472AEC63}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EFA84B10-485C-4410-A201-E5F717404678}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EFA84B10-485C-4410-A201-E5F717404678}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EFA84B10-485C-4410-A201-E5F717404678}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EFA84B10-485C-4410-A201-E5F717404678}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF8058B1-5AD2-4E0F-B483-12FE69C7ABBD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF8058B1-5AD2-4E0F-B483-12FE69C7ABBD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF8058B1-5AD2-4E0F-B483-12FE69C7ABBD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF8058B1-5AD2-4E0F-B483-12FE69C7ABBD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7431962-0830-47B5-8E51-8EED823E8794}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7431962-0830-47B5-8E51-8EED823E8794}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7431962-0830-47B5-8E51-8EED823E8794}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7431962-0830-47B5-8E51-8EED823E8794}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A0D36FA0-B374-4702-B51D-D7BBB8A764A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0D36FA0-B374-4702-B51D-D7BBB8A764A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A0D36FA0-B374-4702-B51D-D7BBB8A764A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A0D36FA0-B374-4702-B51D-D7BBB8A764A8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D3385699-829C-4D03-A5CA-788D1470FD2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3385699-829C-4D03-A5CA-788D1470FD2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3385699-829C-4D03-A5CA-788D1470FD2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3385699-829C-4D03-A5CA-788D1470FD2A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2437B71B-0685-4428-93F2-8A1C472AEC63}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2437B71B-0685-4428-93F2-8A1C472AEC63}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2437B71B-0685-4428-93F2-8A1C472AEC63}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2437B71B-0685-4428-93F2-8A1C472AEC63}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{3947EC73-A7D9-482C-86B1-8E4F6387B5FC} = {EFD3DA34-B04F-4C90-B3E0-BEB2402B2D6A}
+		{275062C9-CF0B-4445-8940-1D6106966163} = {EFD3DA34-B04F-4C90-B3E0-BEB2402B2D6A}
+		{EFA84B10-485C-4410-A201-E5F717404678} = {3947EC73-A7D9-482C-86B1-8E4F6387B5FC}
+		{AF8058B1-5AD2-4E0F-B483-12FE69C7ABBD} = {3947EC73-A7D9-482C-86B1-8E4F6387B5FC}
+		{F7431962-0830-47B5-8E51-8EED823E8794} = {3947EC73-A7D9-482C-86B1-8E4F6387B5FC}
+		{5C89E98A-C88E-4478-9AD5-7FFE87AFD903} = {A5880995-120F-422E-9B46-4302F74C87FE}
+		{A0D36FA0-B374-4702-B51D-D7BBB8A764A8} = {5C89E98A-C88E-4478-9AD5-7FFE87AFD903}
+		{D3385699-829C-4D03-A5CA-788D1470FD2A} = {5C89E98A-C88E-4478-9AD5-7FFE87AFD903}
+		{2437B71B-0685-4428-93F2-8A1C472AEC63} = {5C89E98A-C88E-4478-9AD5-7FFE87AFD903}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C067AF04-0718-4504-9C39-F953038CFF86}
+	EndGlobalSection
+EndGlobal
