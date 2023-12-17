@@ -40,26 +40,6 @@ public static class ServiceProviderExtensions
     }
 
     /// <summary>
-    /// Get Optional Orleans Service By Name.
-    /// </summary>
-    /// <param name="serviceProvider">The service provider.</param>
-    /// <param name="name">The name.</param>
-    /// <typeparam name="TService">The service type.</typeparam>
-    /// <returns>The service.</returns>
-    public static TService? GetOptionalOrleansServiceByName<TService>(this IServiceProvider serviceProvider, string name)
-#if !NET8_0_OR_GREATER
-        where TService : class
-#endif
-    {
-        ArgumentNullException.ThrowIfNull(name);
-#if NET8_0_OR_GREATER
-        return serviceProvider.GetKeyedService<TService>(name);
-#else
-        return serviceProvider.GetServiceByKey<object?, TService>(name);
-#endif
-    }
-
-    /// <summary>
     /// Create Stream Queue Mapper.
     /// </summary>
     /// <param name="serviceProvider">The service provider.</param>
@@ -90,7 +70,7 @@ public static class ServiceProviderExtensions
     /// <returns>The queue adapter cache.</returns>
     /// <exception cref="ArgumentException">The argument exception when name is not string.</exception>
     internal static IQueueAdapterCache CreateDefaultQueueAdapterCache(
-        IServiceProvider serviceProvider,
+        this IServiceProvider serviceProvider,
         object? name)
     {
         ArgumentNullException.ThrowIfNull(serviceProvider);
@@ -103,15 +83,5 @@ public static class ServiceProviderExtensions
         var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
         var options = serviceProvider.GetOptionsByName<SimpleQueueCacheOptions>(factoryName);
         return new SimpleQueueAdapterCache(options, factoryName, loggerFactory);
-    }
-
-    /// <summary>
-    /// Handle Failure.
-    /// </summary>
-    /// <param name="queueId">The queue.</param>
-    /// <returns>The stream failure handler.</returns>
-    internal static Task<IStreamFailureHandler> HandleFailure(QueueId queueId)
-    {
-        return Task.FromResult<IStreamFailureHandler>(new NoOpStreamDeliveryFailureHandler());
     }
 }

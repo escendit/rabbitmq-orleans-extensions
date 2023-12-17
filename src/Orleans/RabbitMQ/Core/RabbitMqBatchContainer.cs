@@ -72,7 +72,7 @@ internal class RabbitMqBatchContainer : IBatchContainer, IComparable<RabbitMqBat
 
     public static bool operator ==(RabbitMqBatchContainer? left, RabbitMqBatchContainer? right)
     {
-        return left?.Equals(right) ?? ReferenceEquals(right, null);
+        return left?.Equals(right) ?? ReferenceEquals(left, right);
     }
 
     public static bool operator !=(RabbitMqBatchContainer? left, RabbitMqBatchContainer? right)
@@ -87,7 +87,7 @@ internal class RabbitMqBatchContainer : IBatchContainer, IComparable<RabbitMqBat
 
     public static bool operator >=(RabbitMqBatchContainer? left, RabbitMqBatchContainer? right)
     {
-        return Compare(left, right) > 0;
+        return Compare(left, right) >= 0;
     }
 
     public static bool operator <(RabbitMqBatchContainer? left, RabbitMqBatchContainer? right)
@@ -97,7 +97,7 @@ internal class RabbitMqBatchContainer : IBatchContainer, IComparable<RabbitMqBat
 
     public static bool operator <=(RabbitMqBatchContainer? left, RabbitMqBatchContainer? right)
     {
-        return Compare(left, right) > 0;
+        return Compare(left, right) <= 0;
     }
 
     /// <inheritdoc />
@@ -126,7 +126,7 @@ internal class RabbitMqBatchContainer : IBatchContainer, IComparable<RabbitMqBat
     /// <inheritdoc />
     public int CompareTo(RabbitMqBatchContainer? other)
     {
-        return other?.CompareTo(this) ?? 0;
+        return Compare(this, other);
     }
 
     /// <inheritdoc/>
@@ -161,11 +161,28 @@ internal class RabbitMqBatchContainer : IBatchContainer, IComparable<RabbitMqBat
 
     private static int Compare(RabbitMqBatchContainer? left, RabbitMqBatchContainer? right)
     {
-        if (left == right)
+        switch (left)
+        {
+            case null when right is null:
+                return 0;
+            case null:
+                return -1;
+            default:
+            {
+                if (right is null)
+                {
+                    return 1;
+                }
+
+                break;
+            }
+        }
+
+        if (left.DeliveryTag.Equals(right.DeliveryTag))
         {
             return 0;
         }
 
-        return left > right ? 1 : -1;
+        return left.DeliveryTag > right.DeliveryTag ? 1 : -1;
     }
 }
