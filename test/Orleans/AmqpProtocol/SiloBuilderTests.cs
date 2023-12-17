@@ -72,6 +72,7 @@ public class SiloBuilderTests
     /// <param name="type">The type.</param>
     [Theory]
     [ClassData(typeof(StreamPubSubTypeGenerator))]
+    [UnitTest]
     public void AddRabbitMqUseStreamProtocolWithPubSubType(StreamPubSubType type)
     {
         var host = _fixture

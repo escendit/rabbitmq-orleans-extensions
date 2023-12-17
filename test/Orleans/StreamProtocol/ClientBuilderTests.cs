@@ -9,6 +9,7 @@ using global::Orleans.Streams;
 using global::RabbitMQ.Tests.Extensions;
 using global::RabbitMQ.Tests.Generators;
 using Hosting;
+using Microsoft.Extensions.Hosting;
 using Xunit.Categories;
 
 /// <summary>
@@ -70,6 +71,7 @@ public class ClientBuilderTests
     /// <param name="type"> The type.</param>
     [Theory]
     [ClassData(typeof(StreamPubSubTypeGenerator))]
+    [UnitTest]
     public void AddRabbitMqUseStreamProtocolUsePubSubType(StreamPubSubType type)
     {
         var host = _fixture

@@ -7,6 +7,7 @@ using Escendit.Orleans.Streaming.RabbitMQ.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Xunit;
+using Xunit.Categories;
 
 /// <summary>
 /// Dependency Injection Usage Tests.
@@ -17,6 +18,7 @@ public class DependencyInjectionUsageTests
     /// Start.
     /// </summary>
     [Fact]
+    [UnitTest]
     public void Start()
     {
         var host = Host.CreateDefaultBuilder()
