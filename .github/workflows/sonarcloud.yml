@@ -75,9 +75,9 @@ jobs:
           dotnet test `
             --configuration Release `
             --no-build `
-            --filter=Category=UnitTest `
+            --filter="Category=UnitTest|Category=IntegrationTest" `
             --collect "XPlat Code Coverage" `
             --results-directory TestResults/ `
             --logger "trx;LogFilePrefix=test-results" `
             -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
-          .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
+          .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
