@@ -53,6 +53,7 @@ public class ConsumerService : JournaledGrain<ConsumerState, ConsumerEvent>, ICo
     /// <inheritdoc />
     public async Task OnNextAsync(ProducerEvent item, StreamSequenceToken? token = null)
     {
+        ArgumentNullException.ThrowIfNull(item);
         var listenedEvent = new ConsumerEvent
         {
             Value = item.NewValue,

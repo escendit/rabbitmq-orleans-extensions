@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 /// <summary>
 /// Producer Service.
 /// </summary>
-public class ProducerService : JournaledGrain<ProducerState, ProducerEvent>, IProducerService
+public partial class ProducerService : JournaledGrain<ProducerState, ProducerEvent>, IProducerService
 {
     private readonly ILogger _logger;
 
@@ -26,7 +26,7 @@ public class ProducerService : JournaledGrain<ProducerState, ProducerEvent>, IPr
     /// <inheritdoc />
     public async Task CallAsync(int newValue, GrainCancellationToken? cancellationToken = default)
     {
-        _logger.LogDebug("Call");
+        Log("Call");
         var streamProvider = this.GetStreamProvider("silo");
         var stream = streamProvider.GetStream<ProducerEvent>("ProducerEvent", Guid.Empty);
 
@@ -43,7 +43,14 @@ public class ProducerService : JournaledGrain<ProducerState, ProducerEvent>, IPr
     /// <inheritdoc />
     public Task<int> GetAsync(GrainCancellationToken? cancellationToken = default)
     {
-        _logger.LogDebug("Get");
+        Log("Get");
         return Task.FromResult(State.Value);
     }
+
+    [LoggerMessage(
+        EventId = 0,
+        EventName = "Message",
+        Level = LogLevel.Debug,
+        Message = "{message}")]
+    private partial void Log(string message);
 }

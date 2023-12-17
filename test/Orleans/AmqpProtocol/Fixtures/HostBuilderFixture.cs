@@ -10,11 +10,14 @@ using Microsoft.Extensions.Hosting;
 /// </summary>
 public sealed class HostBuilderFixture
 {
+    private readonly string _pubSubStore;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="HostBuilderFixture"/> class.
     /// </summary>
     public HostBuilderFixture()
     {
+        _pubSubStore = "PubSubStore";
     }
 
     /// <summary>
@@ -69,17 +72,18 @@ public sealed class HostBuilderFixture
             .UseOrleansClient(clientBuilder);
     }
 
-    private static void SetupSiloDefaults(HostBuilderContext context, ISiloBuilder siloBuilder)
+    private void SetupClientDefaults(IClientBuilder clientBuilder)
+    {
+        clientBuilder
+            .AddMemoryStreams(_pubSubStore)
+            .UseLocalhostClustering();
+    }
+
+    private void SetupSiloDefaults(HostBuilderContext context, ISiloBuilder siloBuilder)
     {
         siloBuilder
             .UseLocalhostClustering()
-            .AddMemoryGrainStorage("PubSubStore")
+            .AddMemoryGrainStorage(_pubSubStore)
             .AddMemoryGrainStorageAsDefault();
-    }
-
-    private static void SetupClientDefaults(IClientBuilder clientBuilder)
-    {
-        clientBuilder
-            .UseLocalhostClustering();
     }
 }

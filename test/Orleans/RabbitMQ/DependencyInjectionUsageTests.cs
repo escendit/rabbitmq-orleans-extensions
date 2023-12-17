@@ -19,9 +19,11 @@ public class DependencyInjectionUsageTests
     [Fact]
     public void Start()
     {
-        Host.CreateDefaultBuilder()
+        var host = Host.CreateDefaultBuilder()
             .UseOrleans(siloBuilder => siloBuilder
                 .AddRabbitMq("Name")
-                .Build());
+                .Build())
+            .Build();
+        Assert.NotNull(host);
     }
 }

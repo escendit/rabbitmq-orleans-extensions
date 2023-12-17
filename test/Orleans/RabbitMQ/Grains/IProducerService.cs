@@ -6,6 +6,7 @@ namespace Escendit.Orleans.Streaming.RabbitMQ.Tests.Grains;
 /// <summary>
 /// Test Producer Service.
 /// </summary>
+[Alias("producer")]
 public interface IProducerService : IGrainWithGuidKey
 {
     /// <summary>
@@ -14,6 +15,7 @@ public interface IProducerService : IGrainWithGuidKey
     /// <param name="newValue">The new value.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The void.</returns>
+    [Alias("call")]
     Task CallAsync(int newValue, GrainCancellationToken? cancellationToken = default);
 
     /// <summary>
@@ -21,5 +23,6 @@ public interface IProducerService : IGrainWithGuidKey
     /// </summary>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The value.</returns>
+    [Alias("get")]
     Task<int> GetAsync(GrainCancellationToken? cancellationToken = default);
 }

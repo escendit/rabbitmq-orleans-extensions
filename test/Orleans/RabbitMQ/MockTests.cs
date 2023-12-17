@@ -6,6 +6,7 @@ namespace RabbitMQ.Tests;
 using Escendit.Orleans.Streaming.RabbitMQ.Provider;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
+using Xunit.Categories;
 
 /// <summary>
 /// Mock Tests.
@@ -31,6 +32,7 @@ public sealed class MockTests : IDisposable
     /// Initial Adapter Factory Base.
     /// </summary>
     [Fact]
+    [UnitTest]
     public void InitiateAdapterFactoryBase()
     {
         var adapterFactory = Substitute.For<AdapterFactoryBase>(GetLogger("test"));
@@ -41,6 +43,7 @@ public sealed class MockTests : IDisposable
     /// Initial Adapter Receiver Base.
     /// </summary>
     [Fact]
+    [UnitTest]
     public void InitiateAdapterReceiverBase()
     {
         var adapterReceiverBase = Substitute.For<AdapterReceiverBase>(GetLogger("test"));

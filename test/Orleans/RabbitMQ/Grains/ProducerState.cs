@@ -7,6 +7,7 @@ namespace Escendit.Orleans.Streaming.RabbitMQ.Tests.Grains;
 /// Producer State.
 /// </summary>
 [GenerateSerializer]
+[Alias("producerState")]
 public class ProducerState
 {
     /// <summary>
@@ -22,6 +23,7 @@ public class ProducerState
     /// <param name="event">The event.</param>
     public void Apply(ProducerEvent @event)
     {
+        ArgumentNullException.ThrowIfNull(@event);
         Value = @event.NewValue;
     }
 }

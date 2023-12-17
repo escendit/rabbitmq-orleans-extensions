@@ -7,6 +7,7 @@ namespace Escendit.Orleans.Streaming.RabbitMQ.Tests.Grains;
 /// Producer Event.
 /// </summary>
 [GenerateSerializer]
+[Alias("producerEvent")]
 public class ProducerEvent
 {
     /// <summary>
