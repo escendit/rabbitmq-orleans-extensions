@@ -4,7 +4,6 @@
 namespace RabbitMQ.Tests;
 
 using Escendit.Orleans.Streaming.RabbitMQ.Hosting;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Xunit;
 using Xunit.Categories;
@@ -22,6 +21,7 @@ public class DependencyInjectionUsageTests
     public void Start()
     {
         var host = Host.CreateDefaultBuilder()
+            .UseOrleans(siloBuilder => siloBuilder.UseLocalhostClustering())
             .UseOrleans(siloBuilder => siloBuilder
                 .AddRabbitMq("Name")
                 .Build())
