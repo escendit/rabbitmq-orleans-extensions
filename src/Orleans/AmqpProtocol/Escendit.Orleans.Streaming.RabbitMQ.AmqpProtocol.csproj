@@ -1,9 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <Description>RabbitMQ Orleans AMQP Streaming Provider</Description>
+        <PackageTags>rabbitmq;orleans;streaming;provider;amqp</PackageTags>
+    </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Escendit.Extensions.DependencyInjection.RabbitMQ.AmqpProtocol" />
-        <PackageReference Include="Microsoft.Orleans.Streaming"/>
+        <PackageReference Include="Escendit.Extensions.DependencyInjection.RabbitMQ.AmqpProtocol"/>
     </ItemGroup>
     <ItemGroup>
-      <ProjectReference Include="..\RabbitMQ\Escendit.Orleans.Streaming.RabbitMQ.csproj" />
+        <ProjectReference Include="..\RabbitMQ\Escendit.Orleans.Streaming.RabbitMQ.csproj"/>
+    </ItemGroup>
+    <ItemGroup>
+        <None Include="README.md" Pack="true" PackagePath=""/>
     </ItemGroup>
 </Project>

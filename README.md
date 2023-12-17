@@ -1,249 +1,88 @@
-# NuGet Package: Escendit.Orleans.Streaming.RabbitMQ
+# RabbitMQ Orleans Extensions
 
-Escendit.Orleans.Streaming.RabbitMQ is a NuGet Package
-that integrates RabbitMQ with [Orleans](https://github.com/dotnet/orleans) Streaming Provider.
-
-The Library contains 2 different ways of streaming, first via Stream Protocol, and other via AMQP protocol.
-
-The Library provides named connections to Rabbit MQ, which can be used for low-level integration events.
+Use RabbitMQ Streaming Provider for [Orleans](https://github.com/dotnet/orleans) in two flavors
+- [AMQP Protocol](src/Orleans/AmqpProtocol)
+- [Stream Protocol](src/Orleans/StreamProtocol)
 
 ## Installation
 
-To install Escendit.Orleans.Streaming.RabbitMQ, run the following command in the Package Manager Console:
+### AMQP Protocol
+
+To install Escendit.Orleans.Streaming.RabbitMQ.AmqpProtocol, run the following command in the Package Manager Console:
 
 ```powershell
-Install-Package Escendit.Orleans.Streaming.RabbitMQ
-```
-
-## Usage
-
-To use Escendit.Orleans.Streaming.RabbitMQ first register the stream provider
-using the `AddRabbitMqStreaming` method in the Orleans configuration:
-
-#### SiloBuilder
-
-```csharp
-var builder = new SiloBuilder()
-    .AddRabbitMqStreaming("ProviderName");
-```
-
-#### ClientBuilder
-
-```csharp
-var builder = new ClientBuilder()
-    .AddRabbitMqStreaming("ProviderName");
+Install-Package Escendit.Orleans.Streaming.RabbitMQ.AmqpProtocol
 ```
 
 ### Stream Protocol
 
-To use Escendit.Orleans.Streaming.RabbitMQ with Stream Protocol,
-first register the stream provider using the `AddRabbitMqStreaming` method in the Orleans configuration,
-and then call the `WithStream` method to specify that the provider should use the Stream Protocol:
+To install Escendit.Orleans.Streaming.RabbitMQ.StreamProtocol, run the following command in the Package Manager Console:
 
-#### SiloBuilder
-
-```csharp
-var hostBuilder = Host
-    .CreateDefaultBuilder()
-    .UseOrleans(builder =>
-    {
-        builder
-            .Configure<ClusterOptions>(options =>
-            {
-                options.ClusterId = "cluster-id";
-                options.ServiceId = "service-id";
-            })
-            .AddStreaming()
-            .AddRabbitMqStreaming("ProviderName")
-            .WithStream(options =>
-            {
-                options.Endpoints.Add(new RabbitEndpoint { HostName = "localhost", Port = 5552 });
-                options.UserName = "guest";
-                options.Password = "guest";
-                options.VirtualHost = "/";
-            });
-    });
+```powershell
+Install-Package Escendit.Orleans.Streaming.RabbitMQ.StreamProtocol
 ```
 
-#### ClientBuilder
-
-```csharp
-var hostBuilder = Host
-    .CreateDefaultBuilder()
-    .UseOrleansClient(builder =>
-    {
-        builder
-            .Configure<ClusterOptions>(options =>
-            {
-                options.ClusterId = "cluster-id";
-                options.ServiceId = "service-id";
-            })
-            .AddStreaming()
-            .AddRabbitMqStreaming("ProviderName")
-            .WithStream(options =>
-            {
-                options.Endpoints.Add(new RabbitEndpoint { HostName = "localhost", Port = 5552 });
-                options.UserName = "guest";
-                options.Password = "guest";
-                options.VirtualHost = "/";
-            });            
-    })
-```
+## Usage
 
 ### AMQP Protocol
-
-To use Escendit.Orleans.Streaming.RabbitMQ with Stream Protocol,
-first register the stream provider using the `AddRabbitMqStreaming` method in the Orleans configuration,
-and then call the `WithQueue` method to specify that the provider should use the AMQP Protocol:
+To use Escendit.Orleans.Streaming.RabbitMQ.AmqpProtocol first register the stream provider
+using the `AddRabbitMq` with `UseAmqpProtocol` method in the Orleans configuration:
 
 #### SiloBuilder
 
 ```csharp
-var hostBuilder = Host
+var host = Host
     .CreateDefaultBuilder()
-    .UseOrleans(builder =>
-    {
-        builder
-            .Configure<ClusterOptions>(options =>
-            {
-                options.ClusterId = "cluster-id";
-                options.ServiceId = "service-id";
-            })
-            .AddStreaming()
-            .AddRabbitMqStreaming("ProviderName")
-            .WithQueue(options =>
-            {
-                options.Endpoints.Add(new RabbitEndpoint { HostName = "localhost", Port = 5672 });
-                options.UserName = "guest";
-                options.Password = "guest";
-                options.VirtualHost = "/";
-            });
-    });
+    .UseOrleans(siloBuilder => siloBuilder
+        .AddRabbitMq("ProviderName")
+        .UseAmqpProtocol(...)
+        .Build())
+    .Build();
 ```
 
 #### ClientBuilder
 
 ```csharp
-var hostBuilder = Host
+var host = Host
     .CreateDefaultBuilder()
-    .UseOrleansClient(builder =>
-    {
-        builder
-            .Configure<ClusterOptions>(options =>
-            {
-                options.ClusterId = "cluster-id";
-                options.ServiceId = "service-id";
-            })
-            .AddStreaming()
-            .AddRabbitMqStreaming("ProviderName")
-            .WithQueue(options =>
-            {
-                options.Endpoints.Add(new RabbitEndpoint { HostName = "localhost", Port = 5672 });
-                options.UserName = "guest";
-                options.Password = "guest";
-                options.VirtualHost = "/";
-            });            
-    })
+    .UseOrleansClient(clientBuilder => clientBuilder
+        .AddRabbitMq("ProviderName")
+        .UseAmqpProtocol(...)
+        .Build())
+    .Build();
 ```
 
-### Low Level Registration
+### Stream Protocol
 
-You can register the Rabbit MQ Classic Client, but the name must not conflict with the Orleans Streaming Provider.
+To use Escendit.Orleans.Streaming.RabbitMQ.StreamProtocol register the stream provider
+using the `AddRabbitMq` with `UseStreamProtocol` method in the Orleans configuration:
 
 #### SiloBuilder
 
 ```csharp
-var hostBuilder = Host
+var host = Host
     .CreateDefaultBuilder()
-    .UseOrleans(builder =>
-    {
-        builder
-            .Configure<ClusterOptions>(options =>
-            {
-                options.ClusterId = "cluster-id";
-                options.ServiceId = "service-id";
-            })
-            .ConfigureServices(services => services
-                .AddRabbitMq("ProviderName", options =>
-                {
-                    options.Endpoints.Add(new RabbitEndpoint { HostName = "localhost", Port = 5672 });
-                    options.UserName = "guest";
-                    options.Password = "guest";
-                    options.VirtualHost = "/";
-                })
-                .WithConnection());
-    });
+    .UseOrleans(siloBuilder => siloBuilder
+        .AddRabbitMq("ProviderName")
+        .UseStreamProtocol(...)
+        .Build())
+    .Build();
 ```
 
 #### ClientBuilder
 
 ```csharp
-var hostBuilder = Host
+var host = Host
     .CreateDefaultBuilder()
-    .UseOrleansClient(builder =>
-    {
-        builder
-            .Configure<ClusterOptions>(options =>
-            {
-                options.ClusterId = "cluster-id";
-                options.ServiceId = "service-id";
-            })
-            .ConfigureServices(services => services
-                .AddRabbitMq("ProviderName", options =>
-                {
-                    options.Endpoints.Add(new RabbitEndpoint { HostName = "localhost", Port = 5672 });
-                    options.UserName = "guest";
-                    options.Password = "guest";
-                    options.VirtualHost = "/";
-                })
-                .WithConnection());          
-    })
-```
-
-## Consume
-
-Create a stream:
-
-```csharp
-public class MyGrain : Grain, IMyGrain
-{
-    private IAsyncStream<T> _stream;
-    public override async Task OnActivateAsync()
-    {
-        var streamProvider = this.GetStreamProvider("ProviderName");
-        _stream = _streamProvider.GetStream<int>(this.GetPrimaryKey(), "stream-namespace");
-        _stream.SubscribeAsync(ReceiveMessage);
-        await base.OnActivateAsync();
-    }
-
-    public async Task SendMessage()
-    {
-        // Send a message
-        await _stream.OnNextAsync(42);
-    }
-    
-    public Task ReceiveMessage(Event @event)
-    {
-        // Receive a message.
-    }
-}
-```
-
-Create a low-level connection:
-
-```csharp
-public class MyService : GrainService
-{
-    private readonly IConnection _connection;
-    public MyService(string name, IServiceProvider serviceProvider)
-    {
-        _connection = serviceProvider.GetRequiredServiceByName<IConnection>(name);
-    }
-}
+    .UseOrleansClient(clientBuilder => clientBuilder
+        .AddRabbitMq("ProviderName")
+        .UseStreamProtocol(...)
+        .Build())
+    .Build();
 ```
 
 ## Contributing
 
-If you'd like to contribute to Escendit.Orleans.Streaming.RabbitMQ,
+If you'd like to contribute to rabbitmq-orleans-extensions,
 please fork the repository and make changes as you'd like.
 Pull requests are warmly welcome.
