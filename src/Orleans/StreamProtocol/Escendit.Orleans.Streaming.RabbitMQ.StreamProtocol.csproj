@@ -7,9 +7,9 @@
         <ProjectReference Include="..\RabbitMQ\Escendit.Orleans.Streaming.RabbitMQ.csproj"/>
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="RabbitMQ.Stream.Client"/>
+        <None Include="README.md" Pack="true" PackagePath=""/>
     </ItemGroup>
     <ItemGroup>
-        <None Include="README.md" Pack="true" PackagePath=""/>
+        <PackageReference Include="Escendit.Extensions.DependencyInjection.RabbitMQ.StreamProtocol"/>
     </ItemGroup>
 </Project>
