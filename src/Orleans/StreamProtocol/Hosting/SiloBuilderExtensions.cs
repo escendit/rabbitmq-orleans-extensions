@@ -8,6 +8,7 @@ using Escendit.Orleans.Streaming.RabbitMQ.Builder;
 using Escendit.Orleans.Streaming.RabbitMQ.Hosting;
 using Escendit.Orleans.Streaming.RabbitMQ.StreamProtocol.Builder;
 using Escendit.Orleans.Streaming.RabbitMQ.StreamProtocol.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Streams;
 
 /// <summary>
@@ -28,9 +29,9 @@ public static class SiloBuilderExtensions
         var configurator = new SiloConfigurator(
             siloBuilder.Name,
             configureDelegate => siloBuilder
-                .ConfigureServices(configureDelegate));
-        configurator
-            .Configure<ConnectionOptions>(options => options.Configure(configureOptions));
+                .ConfigureServices(configureDelegate)
+                .ConfigureServices(services => services
+                    .AddRabbitMqStreamSystem(siloBuilder.Name, configureOptions)));
         return new RabbitMqSiloOptionsBuilder(
             siloBuilder.Name,
             siloBuilder.Services,

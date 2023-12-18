@@ -25,10 +25,10 @@ public class RabbitMqSiloConfigurator : ISiloConfigurator
                 options.UserName = "guest";
                 options.Password = "guest";
                 options.VirtualHost = "/";
+                options.Endpoints.Clear();
                 options.Endpoints.Add(new Endpoint
                 {
                     HostName = "localhost",
-                    Port = 5552,
                 });
             })
             .Build();

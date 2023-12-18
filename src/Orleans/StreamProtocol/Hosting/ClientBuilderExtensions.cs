@@ -7,6 +7,7 @@ using Escendit.Orleans.Streaming.RabbitMQ.Builder;
 using Escendit.Orleans.Streaming.RabbitMQ.Hosting;
 using Escendit.Orleans.Streaming.RabbitMQ.StreamProtocol.Builder;
 using Escendit.Orleans.Streaming.RabbitMQ.StreamProtocol.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Streams;
 using ConnectionOptions = Escendit.Extensions.DependencyInjection.RabbitMQ.Abstractions.ConnectionOptions;
 
@@ -26,8 +27,9 @@ public static class ClientBuilderExtensions
         ArgumentNullException.ThrowIfNull(clientBuilder);
         ArgumentNullException.ThrowIfNull(configureOptions);
         var configurator = new ClusterClientConfigurator(clientBuilder.Name, clientBuilder);
-        configurator
-            .Configure<ConnectionOptions>(options => options.Configure(configureOptions));
+        clientBuilder
+            .ConfigureServices(services => services
+                .AddRabbitMqStreamSystem(clientBuilder.Name, configureOptions));
         return new RabbitMqClientOptionsBuilder(clientBuilder.Name, clientBuilder.Services, configurator)
             .AddSimpleQueueCache()
             .AddHashRingStreamQueueMapper();

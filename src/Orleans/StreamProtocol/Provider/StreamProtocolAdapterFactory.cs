@@ -3,7 +3,6 @@
 
 namespace Escendit.Orleans.Streaming.RabbitMQ.StreamProtocol.Provider;
 
-using System.Net;
 using Configuration;
 using Core;
 using global::Orleans.Configuration;
@@ -14,7 +13,6 @@ using global::RabbitMQ.Stream.Client;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Provider;
-using ConnectionOptions = Extensions.DependencyInjection.RabbitMQ.Abstractions.ConnectionOptions;
 
 /// <summary>
 /// Stream Protocol Adapter Factory.
@@ -23,7 +21,7 @@ public sealed class StreamProtocolAdapterFactory : AdapterFactoryBase
 {
     private readonly ILoggerFactory _loggerFactory;
     private readonly string _name;
-    private readonly ConnectionOptions _connectionOptions;
+    private readonly StreamSystem _streamSystem;
     private readonly ClusterOptions _clusterOptions;
     private readonly Serializer<RabbitMqBatchContainer> _serializer;
     private readonly IStreamQueueMapper _streamQueueMapper;
@@ -34,18 +32,18 @@ public sealed class StreamProtocolAdapterFactory : AdapterFactoryBase
     /// Initializes a new instance of the <see cref="StreamProtocolAdapterFactory"/> class.
     /// </summary>
     /// <param name="name">The name.</param>
+    /// <param name="streamSystem">The stream system.</param>
     /// <param name="streamQueueMapper">stream queue mapper.</param>
     /// <param name="queueAdapterCache">The queue adapter cache.</param>
-    /// <param name="connectionOptions">The connection options.</param>
     /// <param name="streamOptions">The stream options.</param>
     /// <param name="clusterOptions">The cluster options.</param>
     /// <param name="serializer">The serializer.</param>
     /// <param name="loggerFactory">The logger factory.</param>
     public StreamProtocolAdapterFactory(
         string name,
+        StreamSystem streamSystem,
         IStreamQueueMapper streamQueueMapper,
         IQueueAdapterCache queueAdapterCache,
-        ConnectionOptions connectionOptions,
         StreamOptions streamOptions,
         ClusterOptions clusterOptions,
         Serializer serializer,
@@ -55,16 +53,15 @@ public sealed class StreamProtocolAdapterFactory : AdapterFactoryBase
         ArgumentNullException.ThrowIfNull(name);
         ArgumentNullException.ThrowIfNull(streamQueueMapper);
         ArgumentNullException.ThrowIfNull(queueAdapterCache);
-        ArgumentNullException.ThrowIfNull(connectionOptions);
         ArgumentNullException.ThrowIfNull(streamOptions);
         ArgumentNullException.ThrowIfNull(clusterOptions);
         ArgumentNullException.ThrowIfNull(serializer);
         ArgumentNullException.ThrowIfNull(loggerFactory);
         _loggerFactory = loggerFactory;
         _name = name;
+        _streamSystem = streamSystem;
         _streamQueueMapper = streamQueueMapper;
         _queueAdapterCache = queueAdapterCache;
-        _connectionOptions = connectionOptions;
         _clusterOptions = clusterOptions;
         _serializer = serializer.GetSerializer<RabbitMqBatchContainer>();
         _streamFailureHandlerFactory = streamOptions.StreamFailureHandler;
@@ -74,8 +71,7 @@ public sealed class StreamProtocolAdapterFactory : AdapterFactoryBase
     public override async Task<IQueueAdapter> CreateAdapter()
     {
         LogCreateAdapter(_name);
-        var streamSystem = await CreateStreamSystem(_connectionOptions, _loggerFactory.CreateLogger<StreamSystem>());
-        return new StreamProtocolAdapter(_name, _loggerFactory, _clusterOptions, _serializer, _streamQueueMapper, streamSystem);
+        return new StreamProtocolAdapter(_name, _loggerFactory, _clusterOptions, _serializer, _streamQueueMapper, _streamSystem);
     }
 
     /// <inheritdoc />
@@ -116,53 +112,17 @@ public sealed class StreamProtocolAdapterFactory : AdapterFactoryBase
         }
 
         var clusterOptions = serviceProvider.GetProviderClusterOptions(factoryName);
+        var streamSystem = serviceProvider.GetRequiredOrleansServiceByName<StreamSystem>(factoryName);
         var streamQueueMapper = serviceProvider.GetRequiredOrleansServiceByName<IStreamQueueMapper>(factoryName);
         var queueAdapterCache = serviceProvider.GetRequiredOrleansServiceByName<IQueueAdapterCache>(factoryName);
-        var connectionOptions = serviceProvider.GetOptionsByName<ConnectionOptions>(factoryName);
         var streamOptions = serviceProvider.GetOptionsByName<StreamOptions>(factoryName);
         return ActivatorUtilities.CreateInstance<StreamProtocolAdapterFactory>(
             serviceProvider,
             name,
+            streamSystem,
             streamQueueMapper,
             queueAdapterCache,
-            connectionOptions,
             streamOptions,
             clusterOptions.Value);
-    }
-
-    private static Task<StreamSystem> CreateStreamSystem(ConnectionOptions connectionOptions, ILogger<StreamSystem> logger)
-    {
-        return StreamSystem.Create(BuildStreamSystemConfig(connectionOptions), logger);
-    }
-
-    private static StreamSystemConfig BuildStreamSystemConfig(ConnectionOptions options)
-    {
-        return new StreamSystemConfig
-        {
-            Endpoints = options
-                .Endpoints
-                .Select(s => new DnsEndPoint(s.HostName, s.Port ?? 5552) as EndPoint)
-                .ToList(),
-            Heartbeat = options.Heartbeat,
-            Password = options.Password,
-            UserName = options.UserName,
-            VirtualHost = options.VirtualHost,
-            ClientProvidedName = options.ClientProvidedName,
-            Ssl = options.SslOptions is null
-                ? null
-                : new SslOption
-                {
-                    AcceptablePolicyErrors = options.SslOptions.AcceptablePolicyErrors,
-                    ServerName = options.SslOptions.ServerName,
-                    CertificateSelectionCallback = options.SslOptions.CertificateSelectionCallback,
-                    CertificateValidationCallback = options.SslOptions.CertificateValidationCallback,
-                    CertPassphrase = options.SslOptions.CertPassphrase,
-                    CertPath = options.SslOptions.CertPath,
-                    Certs = options.SslOptions.Certificates,
-                    CheckCertificateRevocation = options.SslOptions.CheckCertificateRevocation,
-                    Enabled = options.SslOptions.Enabled,
-                    Version = options.SslOptions.Version,
-                },
-        };
     }
 }
