@@ -1,8 +1,14 @@
 name: report
 on:
   workflow_run:
-    workflows: [build]
-    types: [completed]
+    workflows: 
+      - build
+    types:
+      - completed
+permissions: 
+  contents: read
+  actions: read
+  checks: write
 jobs:
   report:
     runs-on: ubuntu-latest
