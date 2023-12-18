@@ -68,10 +68,10 @@ public sealed class StreamProtocolAdapterFactory : AdapterFactoryBase
     }
 
     /// <inheritdoc />
-    public override async Task<IQueueAdapter> CreateAdapter()
+    public override Task<IQueueAdapter> CreateAdapter()
     {
         LogCreateAdapter(_name);
-        return new StreamProtocolAdapter(_name, _loggerFactory, _clusterOptions, _serializer, _streamQueueMapper, _streamSystem);
+        return Task.FromResult<IQueueAdapter>(new StreamProtocolAdapter(_name, _loggerFactory, _clusterOptions, _serializer, _streamQueueMapper, _streamSystem));
     }
 
     /// <inheritdoc />
