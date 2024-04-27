@@ -24,7 +24,11 @@ public static class ClientBuilderExtensions
     {
         ArgumentNullException.ThrowIfNull(clientBuilder);
         ArgumentNullException.ThrowIfNull(name);
+    #if NET8_0_OR_GREATER
+        return new RabbitMqClientProtocolBuilder(name, clientBuilder.Services, clientBuilder.Configuration);
+    #else
         return new RabbitMqClientProtocolBuilder(name, clientBuilder.Services);
+    #endif
     }
 
     /// <summary>

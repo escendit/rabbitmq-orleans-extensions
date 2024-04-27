@@ -30,7 +30,13 @@ public static class ClientBuilderExtensions
         clientBuilder
             .ConfigureServices(services => services
                 .AddRabbitMqStreamSystem(clientBuilder.Name, configureOptions));
-        return new RabbitMqClientOptionsBuilder(clientBuilder.Name, clientBuilder.Services, configurator)
+        return new RabbitMqClientOptionsBuilder(
+            clientBuilder.Name,
+            clientBuilder.Services,
+#if NET8_0_OR_GREATER
+            clientBuilder.Configuration,
+#endif
+            configurator)
             .AddSimpleQueueCache()
             .AddHashRingStreamQueueMapper();
     }
