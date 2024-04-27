@@ -3,6 +3,7 @@
 
 namespace Escendit.Orleans.Streaming.RabbitMQ.Builder;
 
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 /// <summary>
@@ -10,6 +11,20 @@ using Microsoft.Extensions.DependencyInjection;
 /// </summary>
 public class RabbitMqSiloProtocolBuilder : IRabbitMqSiloProtocolBuilder
 {
+#if NET8_0_OR_GREATER
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RabbitMqSiloProtocolBuilder"/> class.
+    /// </summary>
+    /// <param name="name">The name.</param>
+    /// <param name="services">The initial services.</param>
+    /// <param name="configuration">The configuration.</param>
+    public RabbitMqSiloProtocolBuilder(string name, IServiceCollection services, IConfiguration configuration)
+    {
+        Name = name;
+        Services = services;
+        Configuration = configuration;
+    }
+#else
     /// <summary>
     /// Initializes a new instance of the <see cref="RabbitMqSiloProtocolBuilder"/> class.
     /// </summary>
@@ -20,12 +35,18 @@ public class RabbitMqSiloProtocolBuilder : IRabbitMqSiloProtocolBuilder
         Name = name;
         Services = services;
     }
+#endif
 
     /// <inheritdoc />
     public string Name { get; }
 
     /// <inheritdoc />
     public IServiceCollection Services { get; }
+
+#if NET8_0_OR_GREATER
+    /// <inheritdoc />
+    public IConfiguration Configuration { get; }
+#endif
 
     /// <inheritdoc />
     public IServiceCollection Build()

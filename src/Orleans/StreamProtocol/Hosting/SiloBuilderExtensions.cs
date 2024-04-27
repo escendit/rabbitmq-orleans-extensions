@@ -35,6 +35,9 @@ public static class SiloBuilderExtensions
         return new RabbitMqSiloOptionsBuilder(
             siloBuilder.Name,
             siloBuilder.Services,
+#if NET8_0_OR_GREATER
+            siloBuilder.Configuration,
+#endif
             configurator)
             .AddSimpleQueueCache()
             .AddHashRingStreamQueueMapper();

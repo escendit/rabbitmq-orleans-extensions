@@ -3,6 +3,7 @@
 
 namespace Escendit.Orleans.Streaming.RabbitMQ.AmqpProtocol.Builder;
 
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RabbitMQ.Builder;
 
@@ -32,6 +33,11 @@ internal class RabbitMqClientOptionsBuilder : IRabbitMqClientOptionsBuilder
 
     /// <inheritdoc/>
     public IServiceCollection Services { get; }
+
+#if NET8_0_OR_GREATER
+    /// <inheritdoc/>
+    public IConfiguration Configuration { get; }
+#endif
 
     /// <inheritdoc/>
     public ClusterClientPersistentStreamConfigurator Configurator { get; }
