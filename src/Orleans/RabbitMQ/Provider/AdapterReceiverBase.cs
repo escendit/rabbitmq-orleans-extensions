@@ -66,7 +66,7 @@ public abstract partial class AdapterReceiverBase : IQueueAdapterReceiver
     [LoggerMessage(
         EventId = 102,
         EventName = "Log Get Queue Messages",
-        Level = LogLevel.Debug,
+        Level = LogLevel.Trace,
         Message = "Getting Queue Messages for ProviderName: {name}, QueueId {queueId}, MaxCount: {maxCount}")]
     protected partial void LogGetQueueMessages(string name, QueueId queueId, int maxCount);
 
