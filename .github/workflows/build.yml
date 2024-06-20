@@ -1,8 +1,20 @@
 name: build
+
 on:
-  push:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: 
+      - opened
+      - synchronize
+      - reopened
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_NOLOGO: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -10,39 +22,58 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: '0'
+
       - name: Start RabbitMQ
         uses: namoshek/rabbitmq-github-action@v1
         with:
           version: '3.12'
           ports: '5672:5672 5552:5552'
           plugins: rabbitmq_stream
+
       - name: Setup .NET Core SDK 7, 8
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: |
             7.0.x
             8.0.x
+
       - name: Restore .NET Packages
         run: dotnet restore
+
       - name: Build .NET Solution
         run: dotnet build --configuration Release --no-restore
+
       - name: Test .NET Solution
         run: dotnet test --configuration Release --no-build --filter="Category=UnitTest|Category=IntegrationTest" --logger "trx;LogFilePrefix=test-results"
+
       - uses: actions/upload-artifact@v4
         if: success() || failure()
         with:
           name: test-results
           path: "**/test-results*.trx"
+
       - name: Pack .NET Solution
         run: dotnet pack --configuration Release --no-build --output pack/
-        if: ${{ github.event_name != 'pull_request' && github.ref_name == 'main' }}
+        if: ${{ github.event_name == 'release'  && github.ref_type == 'tag' || github.event.release.tag_name }}
+
       - name: Publish .NET Solution to GitHub Packages
         continue-on-error: true
         run: dotnet nuget push pack/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
-        if: ${{ github.event_name != 'pull_request' && github.ref_name == 'main' }}
+        if: ${{ github.event_name == 'release'  && github.ref_type == 'tag' || github.event.release.tag_name }}
+
+      - name: Store .NET Package
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget
+          if-no-files-found: error
+          retention-days: 7
+          path: pack/*.nupkg
+        if: ${{ github.event_name == 'release'  && github.ref_type == 'tag' || github.event.release.tag_name }}
+
       - name: Publish .NET Solution to NuGet.org
+        continue-on-error: true
         env:
           apikey: ${{ secrets.NUGET_ORG_KEY }}
-        if: ${{ env.apikey != '' && github.event_name != 'pull_request' && github.ref_name == 'main' }}
         run: dotnet nuget push pack/*.nupkg --api-key ${{ secrets.NUGET_ORG_KEY }} --source nuget
-        continue-on-error: true
+        if: ${{ env.apikey != '' && github.event_name == 'release'  && github.ref_type == 'tag' || github.event.release.tag_name }}
+        
