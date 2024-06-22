@@ -60,3 +60,4 @@ autolabeler:
 
 exclude-contributors:
   - dependabot
+  - dependabot[bot]
