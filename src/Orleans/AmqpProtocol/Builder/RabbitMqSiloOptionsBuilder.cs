@@ -3,6 +3,7 @@
 
 namespace Escendit.Orleans.Streaming.RabbitMQ.AmqpProtocol.Builder;
 
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RabbitMQ.Builder;
 
@@ -11,6 +12,22 @@ using RabbitMQ.Builder;
 /// </summary>
 internal class RabbitMqSiloOptionsBuilder : IRabbitMqSiloOptionsBuilder
 {
+#if NET8_0_OR_GREATER
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RabbitMqSiloOptionsBuilder"/> class.
+    /// </summary>
+    /// <param name="name">The name.</param>
+    /// <param name="services">The services.</param>
+    /// <param name="configuration">The configuration.</param>
+    /// <param name="configurator">The configurator.</param>
+    public RabbitMqSiloOptionsBuilder(string name, IServiceCollection services, IConfiguration configuration, SiloPersistentStreamConfigurator configurator)
+    {
+        Name = name;
+        Services = services;
+        Configuration = configuration;
+        Configurator = configurator;
+    }
+#else
     /// <summary>
     /// Initializes a new instance of the <see cref="RabbitMqSiloOptionsBuilder"/> class.
     /// </summary>
@@ -23,12 +40,18 @@ internal class RabbitMqSiloOptionsBuilder : IRabbitMqSiloOptionsBuilder
         Services = services;
         Configurator = configurator;
     }
+#endif
 
     /// <inheritdoc/>
     public string Name { get; }
 
     /// <inheritdoc/>
     public IServiceCollection Services { get; }
+
+#if NET8_0_OR_GREATER
+    /// <inheritdoc/>
+    public IConfiguration Configuration { get; }
+#endif
 
     /// <inheritdoc/>
     public SiloPersistentStreamConfigurator Configurator { get; }

@@ -1,0 +1,63 @@
+﻿name-template: "v$RESOLVED_VERSION"
+tag-template: "v$RESOLVED_VERSION"
+change-template: "- $TITLE by @$AUTHOR (#$NUMBER)"
+no-changes-template: "- No changes"
+
+prerelease: true
+prerelease-identifier: rc
+include-pre-releases: true
+
+categories:
+  - title: "📚 Documentation"
+    labels:
+      - "documentation"
+  - title: "🚀 New Features"
+    labels:
+      - "enhancement"
+  - title: "🐛 Bug Fixes"
+    labels:
+      - "bug"
+  - title: "🧰 Maintenance"
+    labels:
+      - "maintenance"
+  - title: "🚨 Security Updates"
+    labels:
+      - "security"
+  - title: "🔄 Dependency Updates"
+    collapse-after: 3
+    labels:
+      - "dependencies"
+
+version-resolver:
+  major:
+    labels:
+      - "major"
+  minor:
+    labels:
+      - "minor"
+  patch:
+    labels:
+      - "patch"
+  default: patch
+template: |
+  $CHANGES
+
+  ## 👨🏼‍💻 Contributors
+
+  $CONTRIBUTORS
+autolabeler:
+  - label: "github_actions"
+    files:
+      - ".github/**/*"
+  - label: "documentation"
+    files:
+      - "docs/**/*"
+  - label: "maintenance"
+    files:
+      - ".github/**/*"
+      - ".devcontainer/**/*"
+      - "test/**/*"
+
+exclude-contributors:
+  - dependabot
+  - dependabot[bot]

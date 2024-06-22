@@ -25,7 +25,16 @@ public static class SiloBuilderExtensions
     {
         ArgumentNullException.ThrowIfNull(siloBuilder);
         ArgumentNullException.ThrowIfNull(name);
-        return new RabbitMqSiloProtocolBuilder(name, siloBuilder.Services);
+#if NET8_0_OR_GREATER
+        return new RabbitMqSiloProtocolBuilder(
+            name,
+            siloBuilder.Services,
+            siloBuilder.Configuration);
+#else
+        return new RabbitMqSiloProtocolBuilder(
+            name,
+            siloBuilder.Services);
+#endif
     }
 
     /// <summary>
