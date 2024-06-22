@@ -57,3 +57,6 @@ autolabeler:
       - ".github/**/*"
       - ".devcontainer/**/*"
       - "test/**/*"
+
+exclude-contributors:
+  - dependabot
