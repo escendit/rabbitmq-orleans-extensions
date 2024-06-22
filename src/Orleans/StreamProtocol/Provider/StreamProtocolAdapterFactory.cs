@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Escendit Ltd. All Rights Reserved.
 // Licensed under the MIT. See LICENSE.txt file in the solution root for full license information.
 
+#pragma warning disable CA1812
+
 namespace Escendit.Orleans.Streaming.RabbitMQ.StreamProtocol.Provider;
 
 using Configuration;
@@ -17,7 +19,7 @@ using RabbitMQ.Provider;
 /// <summary>
 /// Stream Protocol Adapter Factory.
 /// </summary>
-public sealed class StreamProtocolAdapterFactory : AdapterFactoryBase
+internal sealed class StreamProtocolAdapterFactory : AdapterFactoryBase
 {
     private readonly ILoggerFactory _loggerFactory;
     private readonly string _name;

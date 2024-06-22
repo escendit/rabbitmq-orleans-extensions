@@ -13,7 +13,7 @@ using global::RabbitMQ.Client;
 using Microsoft.Extensions.Logging;
 
 /// <summary>
-/// Escendit.Orleans.Streaming.RabbitMQ.Tests AMQP Protocol Adapter.
+/// RabbitMQ AMQP Protocol Adapter.
 /// </summary>
 internal sealed partial class AmqpProtocolAdapter : IQueueAdapter
 {

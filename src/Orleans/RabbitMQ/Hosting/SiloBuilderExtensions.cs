@@ -5,7 +5,6 @@ namespace Escendit.Orleans.Streaming.RabbitMQ.Hosting;
 
 using Builder;
 using global::Orleans.Configuration;
-using global::Orleans.Streams;
 using Microsoft.Extensions.DependencyInjection;
 
 /// <summary>

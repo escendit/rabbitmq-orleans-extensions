@@ -12,4 +12,8 @@
     <ItemGroup>
         <PackageReference Include="Escendit.Extensions.DependencyInjection.RabbitMQ.StreamProtocol"/>
     </ItemGroup>
+    <ItemGroup>
+        <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Shipped.txt"/>
+        <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Unshipped.txt"/>
+    </ItemGroup>
 </Project>

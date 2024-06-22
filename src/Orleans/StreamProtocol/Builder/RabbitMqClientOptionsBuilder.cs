@@ -4,7 +4,9 @@
 namespace Escendit.Orleans.Streaming.RabbitMQ.StreamProtocol.Builder;
 
 using Escendit.Orleans.Streaming.RabbitMQ.Builder;
+#if NET8_0_OR_GREATER
 using Microsoft.Extensions.Configuration;
+#endif
 using Microsoft.Extensions.DependencyInjection;
 
 /// <summary>

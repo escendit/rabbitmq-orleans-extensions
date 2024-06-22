@@ -1,0 +1,53 @@
+#nullable enable
+abstract Escendit.Orleans.Streaming.RabbitMQ.Provider.AdapterFactoryBase.CreateAdapter() -> System.Threading.Tasks.Task<Orleans.Streams.IQueueAdapter!>!
+abstract Escendit.Orleans.Streaming.RabbitMQ.Provider.AdapterFactoryBase.GetDeliveryFailureHandler(Orleans.Streams.QueueId queueId) -> System.Threading.Tasks.Task<Orleans.Streams.IStreamFailureHandler!>!
+abstract Escendit.Orleans.Streaming.RabbitMQ.Provider.AdapterFactoryBase.GetQueueAdapterCache() -> Orleans.Streams.IQueueAdapterCache!
+abstract Escendit.Orleans.Streaming.RabbitMQ.Provider.AdapterFactoryBase.GetStreamQueueMapper() -> Orleans.Streams.IStreamQueueMapper!
+abstract Escendit.Orleans.Streaming.RabbitMQ.Provider.AdapterReceiverBase.GetQueueMessagesAsync(int maxCount) -> System.Threading.Tasks.Task<System.Collections.Generic.IList<Orleans.Streams.IBatchContainer!>!>!
+abstract Escendit.Orleans.Streaming.RabbitMQ.Provider.AdapterReceiverBase.Initialize(System.TimeSpan timeout) -> System.Threading.Tasks.Task!
+abstract Escendit.Orleans.Streaming.RabbitMQ.Provider.AdapterReceiverBase.MessagesDeliveredAsync(System.Collections.Generic.IList<Orleans.Streams.IBatchContainer!>! messages) -> System.Threading.Tasks.Task!
+abstract Escendit.Orleans.Streaming.RabbitMQ.Provider.AdapterReceiverBase.Shutdown(System.TimeSpan timeout) -> System.Threading.Tasks.Task!
+Escendit.Orleans.Streaming.RabbitMQ.Builder.IRabbitMqBuilder
+Escendit.Orleans.Streaming.RabbitMQ.Builder.IRabbitMqClientOptionsBuilder
+Escendit.Orleans.Streaming.RabbitMQ.Builder.IRabbitMqClientProtocolBuilder
+Escendit.Orleans.Streaming.RabbitMQ.Builder.IRabbitMqSiloProtocolBuilder
+Escendit.Orleans.Streaming.RabbitMQ.Builder.RabbitMqClientProtocolBuilder
+Escendit.Orleans.Streaming.RabbitMQ.Builder.RabbitMqClientProtocolBuilder.Build() -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+Escendit.Orleans.Streaming.RabbitMQ.Builder.RabbitMqClientProtocolBuilder.Name.get -> string!
+Escendit.Orleans.Streaming.RabbitMQ.Builder.RabbitMqClientProtocolBuilder.RabbitMqClientProtocolBuilder(string! name, Microsoft.Extensions.DependencyInjection.IServiceCollection! services) -> void
+Escendit.Orleans.Streaming.RabbitMQ.Builder.RabbitMqClientProtocolBuilder.Services.get -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+Escendit.Orleans.Streaming.RabbitMQ.Configuration.OptionsBase
+Escendit.Orleans.Streaming.RabbitMQ.Configuration.OptionsBase.OptionsBase() -> void
+Escendit.Orleans.Streaming.RabbitMQ.Configuration.OptionsBase.StreamFailureHandler.get -> System.Func<Orleans.Streams.QueueId, System.Threading.Tasks.Task<Orleans.Streams.IStreamFailureHandler!>!>!
+Escendit.Orleans.Streaming.RabbitMQ.Core.RabbitMqStreamSequenceToken
+Escendit.Orleans.Streaming.RabbitMQ.Core.RabbitMqStreamSequenceToken.RabbitMqStreamSequenceToken(long sequenceNumber, int eventIndex) -> void
+Escendit.Orleans.Streaming.RabbitMQ.Core.RabbitMqStreamSequenceToken.RabbitMqStreamSequenceToken(Orleans.Streams.StreamSequenceToken! sequenceToken) -> void
+Escendit.Orleans.Streaming.RabbitMQ.Core.RabbitMqStreamSequenceToken.RabbitMqStreamSequenceToken(ulong sequenceNumber) -> void
+Escendit.Orleans.Streaming.RabbitMQ.Hosting.ClientBuilderExtensions
+Escendit.Orleans.Streaming.RabbitMQ.Hosting.SiloBuilderExtensions
+Escendit.Orleans.Streaming.RabbitMQ.Provider.AdapterFactoryBase
+Escendit.Orleans.Streaming.RabbitMQ.Provider.AdapterFactoryBase.AdapterFactoryBase(Microsoft.Extensions.Logging.ILogger! logger) -> void
+Escendit.Orleans.Streaming.RabbitMQ.Provider.AdapterFactoryBase.LogCreateAdapter(string! name) -> void
+Escendit.Orleans.Streaming.RabbitMQ.Provider.AdapterFactoryBase.LogGetDeliveryFailureHandler(string! name, Orleans.Streams.QueueId queueId) -> void
+Escendit.Orleans.Streaming.RabbitMQ.Provider.AdapterFactoryBase.LogGetQueueAdapterCache(string! name) -> void
+Escendit.Orleans.Streaming.RabbitMQ.Provider.AdapterFactoryBase.LogGetStreamQueueMapper(string! name) -> void
+Escendit.Orleans.Streaming.RabbitMQ.Provider.AdapterReceiverBase
+Escendit.Orleans.Streaming.RabbitMQ.Provider.AdapterReceiverBase.AdapterReceiverBase(Microsoft.Extensions.Logging.ILogger! logger) -> void
+Escendit.Orleans.Streaming.RabbitMQ.Provider.AdapterReceiverBase.LogGetQueueMessages(string! name, Orleans.Streams.QueueId queueId, int maxCount) -> void
+Escendit.Orleans.Streaming.RabbitMQ.Provider.AdapterReceiverBase.LogInitialize(string! name, Orleans.Streams.QueueId queueId) -> void
+Escendit.Orleans.Streaming.RabbitMQ.Provider.AdapterReceiverBase.LogMessageHandlerIncomingMessage(string! name, Orleans.Streams.QueueId queueId, int size) -> void
+Escendit.Orleans.Streaming.RabbitMQ.Provider.AdapterReceiverBase.LogMessagesDelivered(string! name, Orleans.Streams.QueueId queueId, int count) -> void
+Escendit.Orleans.Streaming.RabbitMQ.Provider.AdapterReceiverBase.LogShutdown(string! name, Orleans.Streams.QueueId queueId) -> void
+override Escendit.Orleans.Streaming.RabbitMQ.Core.RabbitMqStreamSequenceToken.CompareTo(Orleans.Streams.StreamSequenceToken? other) -> int
+override Escendit.Orleans.Streaming.RabbitMQ.Core.RabbitMqStreamSequenceToken.Equals(object? obj) -> bool
+override Escendit.Orleans.Streaming.RabbitMQ.Core.RabbitMqStreamSequenceToken.Equals(Orleans.Streams.StreamSequenceToken? other) -> bool
+override Escendit.Orleans.Streaming.RabbitMQ.Core.RabbitMqStreamSequenceToken.EventIndex.get -> int
+override Escendit.Orleans.Streaming.RabbitMQ.Core.RabbitMqStreamSequenceToken.EventIndex.set -> void
+override Escendit.Orleans.Streaming.RabbitMQ.Core.RabbitMqStreamSequenceToken.GetHashCode() -> int
+override Escendit.Orleans.Streaming.RabbitMQ.Core.RabbitMqStreamSequenceToken.SequenceNumber.get -> long
+override Escendit.Orleans.Streaming.RabbitMQ.Core.RabbitMqStreamSequenceToken.SequenceNumber.set -> void
+override Escendit.Orleans.Streaming.RabbitMQ.Core.RabbitMqStreamSequenceToken.ToString() -> string!
+static Escendit.Orleans.Streaming.RabbitMQ.Hosting.ClientBuilderExtensions.AddRabbitMq(this Orleans.Hosting.IClientBuilder! clientBuilder, string! name) -> Escendit.Orleans.Streaming.RabbitMQ.Builder.IRabbitMqClientProtocolBuilder!
+static Escendit.Orleans.Streaming.RabbitMQ.Hosting.SiloBuilderExtensions.AddRabbitMq(this Orleans.Hosting.ISiloBuilder! siloBuilder, string! name) -> Escendit.Orleans.Streaming.RabbitMQ.Builder.IRabbitMqSiloProtocolBuilder!
+static System.ServiceProviderExtensions.GetRequiredOrleansServiceByName<TService>(this System.IServiceProvider! serviceProvider, string! name) -> TService!
+System.ServiceProviderExtensions

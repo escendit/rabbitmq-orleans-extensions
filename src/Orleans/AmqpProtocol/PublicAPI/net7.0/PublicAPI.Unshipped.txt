@@ -1,0 +1,16 @@
+﻿Escendit.Orleans.Streaming.RabbitMQ.AmqpProtocol.Configuration.QueueOptions
+Escendit.Orleans.Streaming.RabbitMQ.AmqpProtocol.Configuration.QueueOptions.IsDurable.get -> bool
+Escendit.Orleans.Streaming.RabbitMQ.AmqpProtocol.Configuration.QueueOptions.IsDurable.set -> void
+Escendit.Orleans.Streaming.RabbitMQ.AmqpProtocol.Configuration.QueueOptions.IsExclusive.get -> bool
+Escendit.Orleans.Streaming.RabbitMQ.AmqpProtocol.Configuration.QueueOptions.IsExclusive.set -> void
+Escendit.Orleans.Streaming.RabbitMQ.AmqpProtocol.Configuration.QueueOptions.Name.get -> string!
+Escendit.Orleans.Streaming.RabbitMQ.AmqpProtocol.Configuration.QueueOptions.Name.set -> void
+Escendit.Orleans.Streaming.RabbitMQ.AmqpProtocol.Configuration.QueueOptions.QueueOptions() -> void
+Escendit.Orleans.Streaming.RabbitMQ.AmqpProtocol.Configuration.QueueOptions.Type.get -> string!
+Escendit.Orleans.Streaming.RabbitMQ.AmqpProtocol.Configuration.QueueOptions.Type.set -> void
+Orleans.Hosting.ClientBuilderExtensions
+Orleans.Hosting.SiloBuilderExtensions
+static Orleans.Hosting.ClientBuilderExtensions.ConfigureStreamPubSub(this Escendit.Orleans.Streaming.RabbitMQ.Builder.IRabbitMqClientOptionsBuilder! clientBuilder, Orleans.Streams.StreamPubSubType streamPubSubType = Orleans.Streams.StreamPubSubType.ExplicitGrainBasedAndImplicit) -> Escendit.Orleans.Streaming.RabbitMQ.Builder.IRabbitMqClientOptionsBuilder!
+static Orleans.Hosting.ClientBuilderExtensions.UseAmqpProtocol(this Escendit.Orleans.Streaming.RabbitMQ.Builder.IRabbitMqClientProtocolBuilder! clientBuilder, System.Action<Escendit.Extensions.DependencyInjection.RabbitMQ.Abstractions.ConnectionOptions!>! configureOptions) -> Escendit.Orleans.Streaming.RabbitMQ.Builder.IRabbitMqClientOptionsBuilder!
+static Orleans.Hosting.SiloBuilderExtensions.ConfigureStreamPubSub(this Escendit.Orleans.Streaming.RabbitMQ.Builder.IRabbitMqSiloOptionsBuilder! siloBuilder, Orleans.Streams.StreamPubSubType streamPubSubType = Orleans.Streams.StreamPubSubType.ExplicitGrainBasedAndImplicit) -> Escendit.Orleans.Streaming.RabbitMQ.Builder.IRabbitMqSiloOptionsBuilder!
+static Orleans.Hosting.SiloBuilderExtensions.UseAmqpProtocol(this Escendit.Orleans.Streaming.RabbitMQ.Builder.IRabbitMqSiloProtocolBuilder! siloBuilder, System.Action<Escendit.Extensions.DependencyInjection.RabbitMQ.Abstractions.ConnectionOptions!>! configureOptions) -> Escendit.Orleans.Streaming.RabbitMQ.Builder.IRabbitMqSiloOptionsBuilder!
