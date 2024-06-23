@@ -16,6 +16,11 @@ Escendit.Orleans.Streaming.RabbitMQ.Builder.RabbitMqClientProtocolBuilder.Build(
 Escendit.Orleans.Streaming.RabbitMQ.Builder.RabbitMqClientProtocolBuilder.Name.get -> string!
 Escendit.Orleans.Streaming.RabbitMQ.Builder.RabbitMqClientProtocolBuilder.RabbitMqClientProtocolBuilder(string! name, Microsoft.Extensions.DependencyInjection.IServiceCollection! services) -> void
 Escendit.Orleans.Streaming.RabbitMQ.Builder.RabbitMqClientProtocolBuilder.Services.get -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+Escendit.Orleans.Streaming.RabbitMQ.Builder.RabbitMqSiloProtocolBuilder
+Escendit.Orleans.Streaming.RabbitMQ.Builder.RabbitMqSiloProtocolBuilder.Build() -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+Escendit.Orleans.Streaming.RabbitMQ.Builder.RabbitMqSiloProtocolBuilder.Name.get -> string!
+Escendit.Orleans.Streaming.RabbitMQ.Builder.RabbitMqSiloProtocolBuilder.RabbitMqSiloProtocolBuilder(string! name, Microsoft.Extensions.DependencyInjection.IServiceCollection! services) -> void
+Escendit.Orleans.Streaming.RabbitMQ.Builder.RabbitMqSiloProtocolBuilder.Services.get -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
 Escendit.Orleans.Streaming.RabbitMQ.Configuration.OptionsBase
 Escendit.Orleans.Streaming.RabbitMQ.Configuration.OptionsBase.OptionsBase() -> void
 Escendit.Orleans.Streaming.RabbitMQ.Configuration.OptionsBase.StreamFailureHandler.get -> System.Func<Orleans.Streams.QueueId, System.Threading.Tasks.Task<Orleans.Streams.IStreamFailureHandler!>!>!
