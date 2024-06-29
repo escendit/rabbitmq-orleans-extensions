@@ -23,6 +23,15 @@ public class OptionsBase
     /// </summary>
     /// <value>The stream failure handler.</value>
     [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public Func<QueueId, Task<IStreamFailureHandler>> StreamFailureHandler { get; set; } = _ =>
         Task.FromResult<IStreamFailureHandler>(new NoOpStreamDeliveryFailureHandler());
+
+    /// <summary>
+    /// Gets or sets a value indicating whether it should fault on subscription error.
+    /// </summary>
+    /// <value>The flag if subscription should fault.</value>
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
+    public bool ShouldFaultSubscriptionOnError { get; set; }
 }

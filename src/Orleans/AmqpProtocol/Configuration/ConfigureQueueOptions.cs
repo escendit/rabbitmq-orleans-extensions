@@ -28,6 +28,6 @@ internal class ConfigureQueueOptions : IConfigureOptions<QueueOptions>
         ArgumentNullException.ThrowIfNull(options);
         options.StreamFailureHandler = (queueId) =>
             Task.FromResult<IStreamFailureHandler>(
-                new RabbitMqStreamDeliveryFailureHandler(_loggerFactory.CreateLogger<RabbitMqStreamDeliveryFailureHandler>(), queueId));
+                new RabbitMqStreamDeliveryFailureHandler(_loggerFactory.CreateLogger<RabbitMqStreamDeliveryFailureHandler>(), queueId, options.ShouldFaultSubscriptionOnError));
     }
 }
