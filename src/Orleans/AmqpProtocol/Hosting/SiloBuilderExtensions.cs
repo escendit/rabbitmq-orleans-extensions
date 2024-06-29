@@ -54,4 +54,18 @@ public static class SiloBuilderExtensions
         siloBuilder.Configurator.ConfigureStreamPubSub(streamPubSubType);
         return siloBuilder;
     }
+
+    /// <summary>
+    /// Configure Default Stream Failure Handler.
+    /// </summary>
+    /// <param name="siloOptionsBuilder">The initial silo options builder.</param>
+    /// <returns>The updated silo options builder.</returns>
+    public static IRabbitMqSiloOptionsBuilder ConfigureDefaultStreamDeliveryFailureHandler(this IRabbitMqSiloOptionsBuilder siloOptionsBuilder)
+    {
+        siloOptionsBuilder.ConfigureServices(services =>
+        {
+            services.ConfigureOptions<ConfigureQueueOptions>();
+        });
+        return siloOptionsBuilder;
+    }
 }

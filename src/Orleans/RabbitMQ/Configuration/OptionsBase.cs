@@ -9,13 +9,20 @@ using global::Orleans.Streams;
 /// <summary>
 /// Options Base.
 /// </summary>
-public abstract class OptionsBase
+public class OptionsBase
 {
     /// <summary>
-    /// Gets the stream failure handler.
+    /// Initializes a new instance of the <see cref="OptionsBase"/> class.
+    /// </summary>
+    protected OptionsBase()
+    {
+    }
+
+    /// <summary>
+    /// Gets or sets the stream failure handler.
     /// </summary>
     /// <value>The stream failure handler.</value>
     [Browsable(false)]
-    public Func<QueueId, Task<IStreamFailureHandler>> StreamFailureHandler { get; internal set; } = _ =>
+    public Func<QueueId, Task<IStreamFailureHandler>> StreamFailureHandler { get; set; } = _ =>
         Task.FromResult<IStreamFailureHandler>(new NoOpStreamDeliveryFailureHandler());
 }
