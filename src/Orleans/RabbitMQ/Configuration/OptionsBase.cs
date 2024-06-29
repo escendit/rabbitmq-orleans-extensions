@@ -9,13 +9,29 @@ using global::Orleans.Streams;
 /// <summary>
 /// Options Base.
 /// </summary>
-public abstract class OptionsBase
+public class OptionsBase
 {
     /// <summary>
-    /// Gets the stream failure handler.
+    /// Initializes a new instance of the <see cref="OptionsBase"/> class.
+    /// </summary>
+    protected OptionsBase()
+    {
+    }
+
+    /// <summary>
+    /// Gets or sets the stream failure handler.
     /// </summary>
     /// <value>The stream failure handler.</value>
     [Browsable(false)]
-    public Func<QueueId, Task<IStreamFailureHandler>> StreamFailureHandler { get; internal set; } = _ =>
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
+    public Func<QueueId, Task<IStreamFailureHandler>> StreamFailureHandler { get; set; } = _ =>
         Task.FromResult<IStreamFailureHandler>(new NoOpStreamDeliveryFailureHandler());
+
+    /// <summary>
+    /// Gets or sets a value indicating whether it should fault on subscription error.
+    /// </summary>
+    /// <value>The flag if subscription should fault.</value>
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
+    public bool ShouldFaultSubscriptionOnError { get; set; }
 }

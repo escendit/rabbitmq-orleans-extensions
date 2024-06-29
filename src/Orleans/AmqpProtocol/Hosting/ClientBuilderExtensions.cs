@@ -53,4 +53,18 @@ public static class ClientBuilderExtensions
         clientBuilder.Configurator.ConfigureStreamPubSub(streamPubSubType);
         return clientBuilder;
     }
+
+    /// <summary>
+    /// Configure Default Stream Failure Handler.
+    /// </summary>
+    /// <param name="clientBuilder">The initial client options builder.</param>
+    /// <returns>The updated client options builder.</returns>
+    public static IRabbitMqClientOptionsBuilder ConfigureDefaultStreamDeliveryFailureHandler(this IRabbitMqClientOptionsBuilder clientBuilder)
+    {
+        clientBuilder.ConfigureServices(services =>
+        {
+            services.ConfigureOptions<ConfigureQueueOptions>();
+        });
+        return clientBuilder;
+    }
 }
